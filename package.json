@@ -1,0 +1,30 @@
+{
+  "name": "Cinemaddict",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Личный проект «Киноман» от HTML Academy",
+  "scripts": {
+    "build": "webpack",
+    "eslint": "eslint src/**/*.js",
+    "test": "npm run eslint",
+    "start": "webpack-dev-server --open"
+  },
+  "devDependencies": {
+    "chart.js": "2.8.0",
+    "chartjs-plugin-datalabels": "0.7.0",
+    "eslint": "6.1.0",
+    "eslint-config-htmlacademy": "0.5.2",
+    "moment": "^2.24.0",
+    "moment-locales-webpack-plugin": "1.1.0",
+    "stylelint-config-htmlacademy": "^0.1.4",
+    "webpack": "^4.39.1",
+    "webpack-cli": "^3.3.6",
+    "webpack-dev-server": "3.8.0"
+  },
+  "engines": {
+    "node": "10"
+  },
+  "dependencies": {
+    "lodash": "^4.17.15"
+  }
+}

@@ -1,26 +1,27 @@
 import MovieContainer from "../components/movie-container";
-import { render, Position, HOME_PAGE_TITLES } from "../utils";
+import { render, Position, HOME_PAGE_TITLES, hideElement } from "../utils";
 import MovieList from "../components/movie-list";
 import MovieBoard from "./movie-board";
 import BtnShowMore from "../components/btn-show-more";
-
+import MovieBoardMore from "./movie-board-more";
+import Sort from "../components/sort.js";
 
 export default class HomePageController {
-  constructor(container, movieData, commentsData) {
-    this._mainContainer= container;
-    this._movieData = movieData;
-    this._commentsData = commentsData;
+  constructor(container) {
+    this._mainContainer = container;
     this._container = new MovieContainer();
-    this._MAIN_COUNT_MOVIE = 5;
     this._EXTRA_COUNT_MOVIE = 2;
     this._btnShowMore = new BtnShowMore();
+    this._onSortBtnClick = this._onSortBtnClick.bind(this);
+    this._sort = new Sort(this._onSortBtnClick);
   }
 
-  init() {
-
+  init(movieData, commentsData) {
+    this._movieData = movieData;
+    this._commentsData = commentsData;
     const BOARDS_LIST = {
       'all': {
-        movieData: this._movieData.slice(0, this._MAIN_COUNT_MOVIE),
+        movieData: this._movieData,
         isExtra: false,
         title: HOME_PAGE_TITLES.main,
       },
@@ -35,23 +36,28 @@ export default class HomePageController {
         title: HOME_PAGE_TITLES.most_commented,
       },
     }
+    this._renderSort(this._mainContainer);
     render(this._mainContainer, this._container.getElement(), Position.BEFOREEND);
 
-    // Object.keys(BOARDS_LIST).forEach((board) => {
-    //   this._renderBoard(BOARDS_LIST[board]);
-    // });
+    this._allBoard = new MovieBoardMore(BOARDS_LIST.all, this._commentsData, this._container.getElement());
+    this._allBoard.init();
 
-    this._allBoard = this._renderBoard(BOARDS_LIST.all);
     this._topRated = this._renderBoard(BOARDS_LIST.topRated);
-    this._mostCommented = this._renderBoard(BOARDS_LIST.mostCommented);
+    this._topRated.init();
 
-    // render(this._allBoard, this._btnShowMore.getElement())
+    this._mostCommented = this._renderBoard(BOARDS_LIST.mostCommented);
+    this._mostCommented.init();
   };
 
-  _renderBoard({movieData, isExtra, title}) {
-    const board = new MovieBoard(this._container.getElement(), movieData, this._commentsData, isExtra, title);
-    board.init();
-    return board;
+  _renderSort(container) {
+    console.log('seors')
+    render(container, this._sort.getElement());
+  }
+
+  _renderBoard(parameters) {
+    return new MovieBoard(parameters, this._commentsData, this._container.getElement());
+    // board.init();
+    // return board;
   };
 
   _getTopRatedMovie(movieData) {
@@ -63,4 +69,28 @@ export default class HomePageController {
     const mostCommentedMovie =  movieData.slice().sort((a, b) => b.comments.length - a.comments.length);
      return mostCommentedMovie.slice(0, this._EXTRA_COUNT_MOVIE);
   }
+
+  _getSort(movieData) {
+    console.log(movieData)
+    this._allBoard.render(movieData);
+  }
+
+  _onSortBtnClick(sortType) {
+    const movieDataToRender = {
+      'date': this._movieData.slice().sort((a, b) => a.film_info.release.date - b.film_info.release.date),
+      'rating': this._movieData.slice().sort((a, b) => b.film_info.total_rating - a.film_info.total_rating),
+      'default': this._movieData,
+      // 'comments': movieData.slice().sort((a, b) => b.comments.length - a.comments.length),
+    };
+    this._getSort(movieDataToRender[sortType]);
+  }
+
+  // hide() {
+  //   hideElement(this._container.getElement());
+  // }
+  filter() {
+    hideElement(this._container.getElement());
+  }
+
+
 }

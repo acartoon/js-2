@@ -1,7 +1,7 @@
 import moment from "moment";
 
 export const windows = {
-  MAIN: `nain`,
+  MAIN: `main`,
   SEARCH: `search`,
   STATS: `stats`,
 }
@@ -151,4 +151,8 @@ export const durationMovie = (movieData) => {
     h: Math.floor(duration / 60),
     m: duration % 60
   }
+}
+
+export const hideElement = (element) => {
+  element.classList.add(`visually-hidden`)
 }

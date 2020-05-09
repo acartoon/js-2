@@ -3,8 +3,10 @@ import AbstractComponent from './abstract-component.js';
 export default class Sort extends AbstractComponent {
   constructor(onClick) {
     super();
-    this._callback();
+    this._onBtnClick();
     this._onClick = onClick;
+    this._activeClass = (`sort__button--active`);
+    this._activeBtn = this.getElement().querySelector(`.${this._activeClass}`);
   }
 
   getTemplate() {
@@ -15,12 +17,22 @@ export default class Sort extends AbstractComponent {
     </ul>`;
   }
 
-  _callback() {
+  _onBtnClick() {
     this.getElement().addEventListener(`click`, (evt) => {
       this._onClick(evt.target.dataset.sortType);
-      this.getElement().querySelectorAll(`.sort__button--active`)
-        .forEach((i) => i.classList.remove(`sort__button--active`));
-      evt.target.classList.add(`sort__button--active`);
+      this._renderActiveElement(evt.target)
     });
+  }
+
+  default() {
+    const defaultActiveElem = this.getElement().querySelector(`[data-sort-type="default"]`);
+    this._renderActiveElement(defaultActiveElem)
+  }
+
+  _renderActiveElement(activeElem) {
+    this._activeBtn.classList.remove(this._activeClass);
+    this._activeBtn = activeElem;
+    this._activeBtn.classList.add(this._activeClass);
+
   }
 }

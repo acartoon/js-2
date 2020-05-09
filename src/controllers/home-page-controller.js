@@ -1,5 +1,5 @@
 import MovieContainer from "../components/movie-container";
-import { render, Position, HOME_PAGE_TITLES, hideElement, filterFlag } from "../utils";
+import { render, Position, BOARDS_LIST, hideElement, filterFlag } from "../utils";
 import MovieList from "../components/movie-list";
 import MovieBoard from "./movie-board";
 import BtnShowMore from "../components/btn-show-more";
@@ -14,51 +14,32 @@ export default class HomePageController {
     this._btnShowMore = new BtnShowMore();
     this._onSortBtnClick = this._onSortBtnClick.bind(this);
     this._sort = new Sort(this._onSortBtnClick);
-    this._dataToSort = [];
+    this._mainBoardData = [];
+    this._filterType = 'all';
   }
 
   init(movieData, commentsData) {
     this._movieData = movieData;
     this._commentsData = commentsData;
-    const BOARDS_LIST = {
-      'all': {
-        movieData: this._movieData,
-        isExtra: false,
-        title: HOME_PAGE_TITLES.main,
-      },
-      'topRated': {
-        movieData: this._getTopRatedMovie(this._movieData),
-        isExtra: true,
-        title: HOME_PAGE_TITLES.Top_rated,
-      },
-      'mostCommented': {
-        movieData: this._getMostCommentedMovie(this._movieData),
-        isExtra: true,
-        title: HOME_PAGE_TITLES.most_commented,
-      },
-    }
+    this._mainBoardData = this._movieData;
+
     this._renderSort(this._mainContainer);
     render(this._mainContainer, this._container.getElement(), Position.BEFOREEND);
 
-    this._mainBoard = new MovieBoardMore(BOARDS_LIST.all, this._commentsData, this._container.getElement());
+
+    this._mainBoard = new MovieBoardMore(BOARDS_LIST.ALL, this._mainBoardData, this._commentsData, this._container.getElement());
     this._mainBoard.init();
 
-    this._topRated = this._renderBoard(BOARDS_LIST.topRated);
+    this._topRated = new MovieBoard(BOARDS_LIST.TOP_RATED, this._getTopRatedMovie(this._movieData), this._commentsData, this._container.getElement());
     this._topRated.init();
 
-    this._mostCommented = this._renderBoard(BOARDS_LIST.mostCommented);
+    this._mostCommented = new MovieBoard(BOARDS_LIST.MOST_COMMENTED, this._getMostCommentedMovie(this._movieData), this._commentsData, this._container.getElement());
     this._mostCommented.init();
   };
 
   _renderSort(container) {
     render(container, this._sort.getElement());
   }
-
-  _renderBoard(parameters) {
-    return new MovieBoard(parameters, this._commentsData, this._container.getElement());
-    // board.init();
-    // return board;
-  };
 
   _getTopRatedMovie(movieData) {
     const topRatedMovie = movieData.slice().sort((a, b) => b.film_info.total_rating - a.film_info.total_rating);
@@ -76,24 +57,33 @@ export default class HomePageController {
 
   _onSortBtnClick(sortType) {
     const movieDataToRender = {
-      'date': this._movieData.slice().sort((a, b) => a.film_info.release.date - b.film_info.release.date),
-      'rating': this._movieData.slice().sort((a, b) => b.film_info.total_rating - a.film_info.total_rating),
-      'default': this._movieData,
+      date: this._mainBoardData.slice().sort((a, b) => a.film_info.release.date - b.film_info.release.date),
+      rating: this._mainBoardData.slice().sort((a, b) => b.film_info.total_rating - a.film_info.total_rating),
+      default: this._mainBoardData,
       // 'comments': movieData.slice().sort((a, b) => b.comments.length - a.comments.length),
     };
     this._rerendMainBoard(movieDataToRender[sortType], filterFlag.save);
   }
 
-  filter(filterType) {
-    // this._topRated.hide();
-    // this._mostCommented.hide();
 
-    const filterData = {
-      'watchlist': this._movieData.filter((movie) => movie[`user_details`][`watchlist`] === true),
-      'history': this._movieData.filter((movie) => movie[`user_details`][`already_watched`] === true),
-      'favorites': this._movieData.filter((movie) => movie[`user_details`][`favorite`] === true),
+  _getMainBoardData(fulterType) {
+    const data = {
+      all: this._movieData,
+      watchlist: this._movieData.filter((movie) => movie[`user_details`][`watchlist`] === true),
+      history: this._movieData.filter((movie) => movie[`user_details`][`already_watched`] === true),
+      favorites: this._movieData.filter((movie) => movie[`user_details`][`favorite`] === true),
     }
-    this._dataToSort = filterData[filterType];
-    this._rerendMainBoard(filterData[filterType], filterFlag.reset);
+    return data[fulterType];
+  }
+
+  hide() {
+
+  }
+
+  show(movieData, filterType) {
+    this._sort.default();
+    this._movieData = movieData;
+    this._mainBoardData = this._getMainBoardData(filterType);
+    this._rerendMainBoard(this._mainBoardData, filterFlag.reset)
   }
 }

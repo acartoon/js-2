@@ -3,8 +3,8 @@ import BtnShowMore from "../components/btn-show-more";
 import { render, hideElement, filterFlag } from "../utils";
 
 export default class MovieBoardMore extends MovieBoard {
-  constructor(container, movieData, commentsData, isExtra, title) {
-    super(container, movieData, commentsData, isExtra, title);
+  constructor({isExtra, title}, movieData, commentsData, container) {
+    super({isExtra, title}, movieData, commentsData, container);
     this._btn = new BtnShowMore();
     this._STEP_TO_RENDER = 5;
     this._countMovieToRender = this._STEP_TO_RENDER;
@@ -12,7 +12,6 @@ export default class MovieBoardMore extends MovieBoard {
   }
 
   init() {
-    console.log(this._movieData)
     this._renderContainer();
 
     this._countMovieToRender = this._STEP_TO_RENDER;
@@ -47,7 +46,6 @@ export default class MovieBoardMore extends MovieBoard {
 
   render(movieData, flag) {
     this._movieData = movieData;
-    console.log(this._movieData)
     this._countMovieToRender = (flag === filterFlag.save) ? this._countMovieToRender : this._STEP_TO_RENDER;
 
     if (this._movieData.length >= this._countMovieToRender) {

@@ -1,5 +1,9 @@
 import moment from "moment";
 
+export const KEY_CODE = {
+  ESC: `Escape`,
+}
+
 export const windows = {
   MAIN: `main`,
   SEARCH: `search`,
@@ -12,30 +16,56 @@ export const filterFlag = {
 }
 
 export const emojis = [`smile`, `sleeping`, `puke`, `angry`];
-export const titles = [`All movies`, `Watchlist`, `History`, `Favorites`];
+
+// меню
+export const FILTER_TYPE = {
+  ALL: {title: `All movies`, anchor: `all`},
+  WATCHLIST: {title: `Watchlist`, anchor: `watchlist`},
+  HISTORY: {title: `History`, anchor: `history`},
+  FAVORITES: {title: `Favorites`, anchor: `favorites`},
+  STATS: {title: `Stats`, anchor: `stats`},
+}
+
+//главная страница
+export const BOARDS_LIST = {
+  ALL: {
+    isExtra: false,
+    title: `All movies. Upcoming`,
+  },
+  TOP_RATED: {
+    isExtra: true,
+    title: `Top rated`,
+  },
+  MOST_COMMENTED: {
+    isExtra: true,
+    title: `Most commented`,
+  },
+}
+
+export const MOVIE_DETAIL_BTN_CONTROLS = {
+  WATCHLIST: {name: `watchlist`, label: `Add to watchlist`},
+  ALREADY_WATCHED: {name: `watched`, label: `Already watched`},
+  FAVORITE: {name: `favorite`, label: `Add to favorites`},
+
+}
+//кнопки карточки фильма в списке
 export const BTN_CARD_CONTROLS = {
-  'watchlist': {
+  watchlist: {
     state: `watchlist`,
     classBtn: `add-to-watchlist`,
     title: `Add to watchlist`
   },
-  'already_watched': {
+  already_watched: {
     state: `watched`,
     classBtn: `mark-as-watched`,
     title: `Mark as watched`
   },
-  'favorite': {
+  favorite: {
     state: `favorite`,
     classBtn: `favorite`,
     title: `Mark as favorite`
   },
 }
-
-export const HOME_PAGE_TITLES = {
-  'main': `All movies. Upcoming`,
-  'Top_rated': `Top rated`,
-  'most_commented': `Most commented`,
-};
 
 export const namesPeople = new Set([
   `Alfred Hitchcock`,
@@ -73,13 +103,10 @@ export const getDescriptionFilm = (description) => {
 };
 
 export const getComments = (commentsId, commentsData) => {
-  return commentsId.map((id) => {
-    for (let i = 0; i < commentsData.length; i++) {
-      if(commentsData[i].id === id) {
-        return commentsData[i]
-      }
-    }
-  });
+  return commentsId.reduce((array, commentId) => {
+    const comment = commentsData.filter((comment) => comment.id === commentId);
+    return [...array, ...comment]
+  }, [])
 }
 
 export function getRandomDate() {

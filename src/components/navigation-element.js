@@ -1,23 +1,36 @@
 import AbstractComponent from './abstract-component.js';
 
 export default class NavigationElement extends AbstractComponent {
-  constructor({title, count, link}, onAction) {
+  constructor({title, anchor}, count) {
     super();
     this._title = title;
     this._count = count;
-    this._link = link;
-    this._onClick();
-    this._onAction = onAction;
+    this._anchor = anchor;
+    this._activeClass = `main-navigation__item--active`;
+    // this._onClick = this._onClick.bind(this);
   }
   getTemplate() {
-    return `<a href="${this._link}" class="main-navigation__item ${this._link === `stats` ? `main-navigation__item--additional` : ``}
+    return `<a href="#${this._anchor}" class="main-navigation__item ${this._count === null ? this._activeClass : ``} ${this._anchor === `stats` ? `main-navigation__item--additional` : ``}
     ">${this._title} ${this._count ? `<span class="main-navigation__item-count"> ${this._count} </span>` : ``}</a>`;
   }
 
-  _onClick() {
+  init(onAction) {
+    this._onClick(onAction)
+  }
+
+  _onClick(onAction) {
     this.getElement().addEventListener('click', (evt) => {
       evt.preventDefault();
-      this._onAction(this._link);
-    })
+      onAction(this._anchor, this);
+      this.onActive();
+    });
+  }
+
+  onActive() {
+    this.getElement().classList.add(this._activeClass);
+  }
+
+  deactive() {
+    this.getElement().classList.remove(this._activeClass);
   }
 }

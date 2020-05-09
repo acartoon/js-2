@@ -3,7 +3,6 @@ import Search from "../components/search.js";
 import Profile from "../components/profile.js";
 import { render } from "../utils.js";
 import MainNavController from "./main-nav-controller.js";
-import MovieBoardMore from "./movie-board-more.js";
 import FilterController from "./filter-controller.js";
 
 export default class MainPageController {
@@ -33,7 +32,12 @@ export default class MainPageController {
   }
 
   _onMainBtnClick(filterType) {
-    this._homePage.filter(filterType);
+    // this._activeWindow.hide();
+    if(filterType === `stats`) {
+      this._stats.show(this._movieData);
+    } else {
+      this._homePage.show(this._movieData, filterType);
+    }
   };
 
   _renderSearchForm(container) {

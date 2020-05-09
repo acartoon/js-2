@@ -1,6 +1,6 @@
 import MovieBoard from "./movie-board";
 import BtnShowMore from "../components/btn-show-more";
-import { render, hideElement } from "../utils";
+import { render, hideElement, filterFlag } from "../utils";
 
 export default class MovieBoardMore extends MovieBoard {
   constructor(container, movieData, commentsData, isExtra, title) {
@@ -45,10 +45,18 @@ export default class MovieBoardMore extends MovieBoard {
     }
   }
 
-  render(movieData) {
+  render(movieData, flag) {
     this._movieData = movieData;
+    console.log(this._movieData)
+    this._countMovieToRender = (flag === filterFlag.save) ? this._countMovieToRender : this._STEP_TO_RENDER;
+
+    if (this._movieData.length >= this._countMovieToRender) {
+      this._btn.getElement().classList.remove(`visually-hidden`);
+      this._btn.getElement().addEventListener('click', this._onClick);
+
+   }
+
     this._movieListContainer.getElement().querySelector(`.films-list__container`).innerHTML = ``;
-    // console.log(this._movieListContainer.getElement())
     const movieToRender = this._movieData.slice(0, this._countMovieToRender);
     this._renderMovie(movieToRender);
   }

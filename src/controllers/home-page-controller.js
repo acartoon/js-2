@@ -1,5 +1,5 @@
 import MovieContainer from "../components/movie-container";
-import { render, Position, HOME_PAGE_TITLES, hideElement } from "../utils";
+import { render, Position, HOME_PAGE_TITLES, hideElement, filterFlag } from "../utils";
 import MovieList from "../components/movie-list";
 import MovieBoard from "./movie-board";
 import BtnShowMore from "../components/btn-show-more";
@@ -14,6 +14,7 @@ export default class HomePageController {
     this._btnShowMore = new BtnShowMore();
     this._onSortBtnClick = this._onSortBtnClick.bind(this);
     this._sort = new Sort(this._onSortBtnClick);
+    this._dataToSort = [];
   }
 
   init(movieData, commentsData) {
@@ -39,8 +40,8 @@ export default class HomePageController {
     this._renderSort(this._mainContainer);
     render(this._mainContainer, this._container.getElement(), Position.BEFOREEND);
 
-    this._allBoard = new MovieBoardMore(BOARDS_LIST.all, this._commentsData, this._container.getElement());
-    this._allBoard.init();
+    this._mainBoard = new MovieBoardMore(BOARDS_LIST.all, this._commentsData, this._container.getElement());
+    this._mainBoard.init();
 
     this._topRated = this._renderBoard(BOARDS_LIST.topRated);
     this._topRated.init();
@@ -50,7 +51,6 @@ export default class HomePageController {
   };
 
   _renderSort(container) {
-    console.log('seors')
     render(container, this._sort.getElement());
   }
 
@@ -70,9 +70,8 @@ export default class HomePageController {
      return mostCommentedMovie.slice(0, this._EXTRA_COUNT_MOVIE);
   }
 
-  _getSort(movieData) {
-    console.log(movieData)
-    this._allBoard.render(movieData);
+  _rerendMainBoard(movieData, flag) {
+    this._mainBoard.render(movieData, flag);
   }
 
   _onSortBtnClick(sortType) {
@@ -82,15 +81,19 @@ export default class HomePageController {
       'default': this._movieData,
       // 'comments': movieData.slice().sort((a, b) => b.comments.length - a.comments.length),
     };
-    this._getSort(movieDataToRender[sortType]);
+    this._rerendMainBoard(movieDataToRender[sortType], filterFlag.save);
   }
 
-  // hide() {
-  //   hideElement(this._container.getElement());
-  // }
-  filter() {
-    hideElement(this._container.getElement());
+  filter(filterType) {
+    // this._topRated.hide();
+    // this._mostCommented.hide();
+
+    const filterData = {
+      'watchlist': this._movieData.filter((movie) => movie[`user_details`][`watchlist`] === true),
+      'history': this._movieData.filter((movie) => movie[`user_details`][`already_watched`] === true),
+      'favorites': this._movieData.filter((movie) => movie[`user_details`][`favorite`] === true),
+    }
+    this._dataToSort = filterData[filterType];
+    this._rerendMainBoard(filterData[filterType], filterFlag.reset);
   }
-
-
 }

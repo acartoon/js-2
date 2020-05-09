@@ -6,6 +6,11 @@ export const windows = {
   STATS: `stats`,
 }
 
+export const filterFlag = {
+  reset: `reset`,
+  save: `save`,
+}
+
 export const emojis = [`smile`, `sleeping`, `puke`, `angry`];
 export const titles = [`All movies`, `Watchlist`, `History`, `Favorites`];
 export const BTN_CARD_CONTROLS = {

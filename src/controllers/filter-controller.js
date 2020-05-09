@@ -44,6 +44,7 @@ export default class FilterController {
     return this._movieData.filter((movie) => {
       return movie[`user_details`][`already_watched`] === true;
     });
+
   }
 
   _getFavoriteList() {

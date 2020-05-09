@@ -33,9 +33,7 @@ export default class MainPageController {
   }
 
   _onMainBtnClick(filterType) {
-    // this._homePage.hide();
-    this._homePage.filter();
-    // this._filterController.init(this._movieData, this._commentsData, filterType);
+    this._homePage.filter(filterType);
   };
 
   _renderSearchForm(container) {

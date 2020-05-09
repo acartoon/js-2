@@ -1,4 +1,4 @@
-import { render, Position } from "../utils";
+import { render, Position, hideElement } from "../utils";
 import MovieList from "../components/movie-list";
 import MovieCard from "../components/movie-card";
 
@@ -36,4 +36,8 @@ export default class MovieBoard {
     this._movieData = movieData;
     this._renderMovie();
   }
+
+  // hide() {
+  //   hideElement(this._movieListContainer.getElement());
+  // }
 }

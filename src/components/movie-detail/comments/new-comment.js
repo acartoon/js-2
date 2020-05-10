@@ -1,5 +1,5 @@
-import AbstractComponent from '../abstract-component.js';
-import {emojis, render, Position} from '../../utils.js';
+import AbstractComponent from '../../abstract-component.js';
+import {emojis, render, Position} from '../../../utils.js';
 import EmojiInput from './emoji-input.js';
 import EmojiLabel from './emoji-label.js';
 
@@ -7,10 +7,16 @@ export default class NewComment extends AbstractComponent {
   constructor(toAddComment) {
     super();
     this._toAddComment = toAddComment;
-    this._init();
+    // this._init();
   }
 
-  _init() {
+  init(container) {
+    this._container = container;
+    this._render();
+    render(this._container, this.getElement())
+  }
+
+  _render() {
     const container = this.getElement().querySelector(`.film-details__emoji-list`);
     emojis.forEach((i) => {
       const emojiLabel = new EmojiLabel(i, this.onChangeEmotion.bind(this));
@@ -38,13 +44,13 @@ export default class NewComment extends AbstractComponent {
   getTemplate() {
     return `<div class="film-details__new-comment">
     <div for="add-emoji" class="film-details__add-emoji-label"></div>
-  
+
     <label class="film-details__comment-label">
       <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment"></textarea>
     </label>
-  
+
     <div class="film-details__emoji-list">
-      
+
     </div>
   </div>`;
   }

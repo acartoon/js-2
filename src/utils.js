@@ -4,6 +4,13 @@ export const KEY_CODE = {
   ESC: `Escape`,
 }
 
+export const DATA_CHANGE = {
+  RATING: `rating`,
+  CONTROLS: `controls`,
+}
+
+export const USER_RATING_COUNT = 9;
+
 export const windows = {
   MAIN: `main`,
   SEARCH: `search`,
@@ -19,11 +26,11 @@ export const emojis = [`smile`, `sleeping`, `puke`, `angry`];
 
 // меню
 export const FILTER_TYPE = {
-  ALL: {title: `All movies`, anchor: `all`},
-  WATCHLIST: {title: `Watchlist`, anchor: `watchlist`},
-  HISTORY: {title: `History`, anchor: `history`},
-  FAVORITES: {title: `Favorites`, anchor: `favorites`},
-  STATS: {title: `Stats`, anchor: `stats`},
+  ALL: {title: `All movies`, anchor: `all`, active: true},
+  WATCHLIST: {title: `Watchlist`, anchor: `watchlist`, active: false},
+  HISTORY: {title: `History`, anchor: `history`, active: false},
+  FAVORITES: {title: `Favorites`, anchor: `favorites`, active: false},
+  STATS: {title: `Stats`, anchor: `stats`, active: false},
 }
 
 //главная страница

@@ -1,4 +1,4 @@
-import AbstractComponent from '../abstract-component.js';
+import AbstractComponent from '../../abstract-component.js';
 import moment from 'moment';
 
 export default class CommentComponent extends AbstractComponent {

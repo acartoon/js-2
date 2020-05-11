@@ -1,4 +1,4 @@
-import {render} from '../utils.js';
+import {render, unrender} from '../utils.js';
 import MovieCommentsContainer from '../components/movie-detail/comments/movie-comments-container.js';
 import CommentsList from '../components/movie-detail/comments/comments-list.js';
 import CommentComponent from '../components/movie-detail/comments/comment-component.js';
@@ -15,7 +15,18 @@ export default class CommentsController{
   init(container) {
     this._container = container;
     this._renderComments(this._commentsData);
-    this._renderNewComments()
+    this._renderNewComments();
+    console.log()
+  }
+
+  unrender() {
+    console.log(`se;lfs;fdgk;alsdgk;`)
+    unrender(this._movieCommentsContainer.getElement());
+    this._movieCommentsContainer.removeElement();
+    unrender(this._commentsList.getElement());
+    this._commentsList.removeElement();
+    unrender(this._newComment.getElement());
+    this._newComment.removeElement();
   }
 
   _renderComments(commentsData) {

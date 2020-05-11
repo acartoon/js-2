@@ -1,15 +1,16 @@
 // import MovieBaseComponent from './movie-base-component.js';
 // import MovieBtnState from './movie-btn-state.js';
-import {render, unrender, BTN_CARD_CONTROLS} from '../utils.js';
+import {render, unrender, BTN_CARD_CONTROLS, DATA_CHANGE, MOVIE_DETAIL_BTN_CONTROLS} from '../utils.js';
 import moment from 'moment';
 import MovieBaseComponent from './movie-base-component.js';
 import MovieBtnControls from './movie-btn-controls.js';
 // import MovieCommentsCount from './movie-comments-count';
 
 export default class MovieCard extends MovieBaseComponent {
-  constructor(data, onDataChange) {
+  constructor(data, onDataChangeMain) {
     super(data);
-    this._onDataChange = onDataChange;
+    this._onDataChangeMain = onDataChangeMain;
+    this.onDataChange = this.onDataChange.bind(this);
     this._movieCommentsCount = null;
 
     this._init();
@@ -25,25 +26,64 @@ export default class MovieCard extends MovieBaseComponent {
     this.getElement().querySelector(`.film-card__controls`).before(this._movieCommentsCount.getElement());
   }
 
-  updateData(typeDataChange, dataToChange) {
-
-    if (typeDataChange === `userState`) {
-      this.getElement().querySelector(`.film-card__controls`).innerHTML = ``;
-      this._renderBtnState(dataToChange.user_details);
-    } else if (typeDataChange === `comment`) {
-      unrender(this._movieCommentsCount.getElement());
-      this._movieCommentsCount.removeElement();
-      this.renderCommentsCount(dataToChange.comments.length);
+  onDataChange(value) {
+    if(value === MOVIE_DETAIL_BTN_CONTROLS.WATCHLIST.name) {
+      this._user_details.watchlist = !this._user_details.watchlist
+    } else if(value ===  MOVIE_DETAIL_BTN_CONTROLS.ALREADY_WATCHED.name) {
+      this._user_details.already_watched = ! this._user_details.already_watched
+    } else if(value === MOVIE_DETAIL_BTN_CONTROLS.FAVORITE.name) {
+      this._user_details.favorite = !this._user_details.favorite
     }
+
+    this._onDataChangeMain(DATA_CHANGE.CONTROLS ,this._user_details)
   }
 
-  _renderBtnControls(user_details) {
+  _updateData(user_details) {
+    this._user_details = user_details;
+  }
+  update(user_details) {
+    this._updateData(user_details);
+    this._updateBtnControls();
+    // if (typeDataChange === DATA_CHANGE.CONTROLS) {
+    //   this.getElement().querySelector(`.film-card__controls`).innerHTML = ``;
+    //   this._renderBtnControls(dataToChange);
+    // } else if (typeDataChange === DATA_CHANGE.RATING) {
+    //   unrender(this._movieCommentsCount.getElement());
+    //   this._movieCommentsCount.removeElement();
+    //   this.renderCommentsCount(dataToChange.comments.length);
+    // }
+  }
+
+  _updateBtnControls() {
+    this.getElement().querySelector(`.film-card__controls`).innerHTML = ``;
+    this._renderBtnControls();
+  }
+  // updateData(typeDataChange, dataToChange) {
+  //   if (typeDataChange === DATA_CHANGE.CONTROLS) {
+  //     this.getElement().querySelector(`.film-card__controls`).innerHTML = ``;
+  //     this._renderBtnControls(dataToChange);
+  //   } else if (typeDataChange === DATA_CHANGE.RATING) {
+  //     unrender(this._movieCommentsCount.getElement());
+  //     this._movieCommentsCount.removeElement();
+  //     this.renderCommentsCount(dataToChange.comments.length);
+  //   }
+  // }
+
+  _renderBtnControls() {
     const btnContainer = this.getElement().querySelector(`.film-card__controls`);
     Object.keys(BTN_CARD_CONTROLS).forEach((key) => {
-      const btn = new MovieBtnControls(BTN_CARD_CONTROLS[key], user_details[key], this._onDataChange);
+      const btn = new MovieBtnControls(BTN_CARD_CONTROLS[key], this._user_details[key], this.onDataChange);
       render(btnContainer, btn.getElement());
     });
   }
+
+  // _renderBtnControls(user_details) {
+  //   const btnContainer = this.getElement().querySelector(`.film-card__controls`);
+  //   Object.keys(BTN_CARD_CONTROLS).forEach((key) => {
+  //     const btn = new MovieBtnControls(BTN_CARD_CONTROLS[key], user_details[key], this.onDataChange);
+  //     render(btnContainer, btn.getElement());
+  //   });
+  // }
 
   getTemplate() {
     return `<article class="film-card">

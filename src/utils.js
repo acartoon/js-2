@@ -7,6 +7,17 @@ export const KEY_CODE = {
 export const DATA_CHANGE = {
   RATING: `rating`,
   CONTROLS: `controls`,
+  WATCHLIST: `watchlist`,
+  FAVORITE: `favorite`,
+  ALREADY_WATCHED: `watched`,
+  CREATE_COMMENT : `create_comment`,
+  REMOVE_COMMENT : `remove_comment`,
+}
+
+export const MOVIE_DETAIL_BTN_CONTROLS = {
+  WATCHLIST: {name: `watchlist`, label: `Add to watchlist`},
+  ALREADY_WATCHED: {name: `watched`, label: `Already watched`},
+  FAVORITE: {name: `favorite`, label: `Add to favorites`},
 }
 
 export const USER_RATING_COUNT = 9;
@@ -49,12 +60,6 @@ export const BOARDS_LIST = {
   },
 }
 
-export const MOVIE_DETAIL_BTN_CONTROLS = {
-  WATCHLIST: {name: `watchlist`, label: `Add to watchlist`},
-  ALREADY_WATCHED: {name: `watched`, label: `Already watched`},
-  FAVORITE: {name: `favorite`, label: `Add to favorites`},
-
-}
 //кнопки карточки фильма в списке
 export const BTN_CARD_CONTROLS = {
   watchlist: {

@@ -1,7 +1,8 @@
 import AbstractComponent from '../abstract-component.js';
 import {render, Position, MOVIE_DETAIL_BTN_CONTROLS, DATA_CHANGE} from '../../utils.js';
-import MovieBtnStateLabel from './btn-controls-label'
-import MovieBtnStateInput from './btn-controls-input'
+import MovieBtnStateLabel from './btn-controls-label';
+import MovieBtnStateInput from './btn-controls-input';
+import {cloneDeep} from 'lodash';
 
 export default class BtnControls extends AbstractComponent {
   constructor({watchlist, already_watched, favorite}, onDataChangeMain) {
@@ -16,6 +17,14 @@ export default class BtnControls extends AbstractComponent {
   init(container) {
     render(container, this.getElement(), Position.BEFOREEND);
     this._renderBtnControls(this._watchlist, this._already_watched, this._favorite);
+  }
+
+  _initTmpData() {
+    this._tmpData = cloneDeep(this._movieData);
+  }
+
+  _resetTmpData() {
+    this._tmpData = null;
   }
 
   _renderBtnControls(watchlist, already_watched, favorite) {
@@ -33,25 +42,40 @@ export default class BtnControls extends AbstractComponent {
     });
   }
 
+  //при срабатывании onDataChange из main вернется срабатываение функции update
   onDataChange(value) {
-    this.onDataChangeMain(DATA_CHANGE.CONTROLS, value);
-    console.log(value);
-
+    let data = null;
     if(value === MOVIE_DETAIL_BTN_CONTROLS.WATCHLIST.name) {
-      this._watchlist = !this._watchlist
+      data = !this._watchlist
     } else if(value ===  MOVIE_DETAIL_BTN_CONTROLS.ALREADY_WATCHED.name) {
-      this._already_watched = !this._already_watched
+      data = !this._already_watched
     } else if(value === MOVIE_DETAIL_BTN_CONTROLS.FAVORITE.name) {
-      this._favorite = !this._favorite
+      data = !this._favorite
     }
 
-    this.update(this._watchlist, this._already_watched, this._favorite)
+    // this.update(this._watchlist, this._already_watched, this._favorite);
+    this.onDataChangeMain(value, data);
+  }
+
+  _updateData(watchlist, already_watched, favorite) {
+    this._watchlist = watchlist;
+    this._already_watched = already_watched;
+    this._favorite = favorite;
   }
 
   update(watchlist, already_watched, favorite) {
+    console.log('')
+    // this._watchlist = watchlist;
+    // this._already_watched = already_watched;
+    // this._favorite = favorite;
+    this._updateData(watchlist, already_watched, favorite);
     this.getElement().innerHTML = ``;
-    this._renderBtnControls(watchlist, already_watched, favorite);
+    this._renderBtnControls(this._watchlist, this._already_watched, this._favorite);
   }
+
+  // reset() {
+
+  // }
 
   getTemplate() {
     return `<section class="film-details__controls">

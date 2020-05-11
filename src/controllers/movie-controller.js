@@ -1,16 +1,18 @@
 import MovieCard from "../components/movie-card";
-import { render, Position, unrender } from "../utils";
+import { render, Position, unrender, DATA_CHANGE } from "../utils";
 import MovieDetailsController from "./movie-details-controller";
 
 export default class MovieController {
-  constructor(movieData, commentsData, container, onDataChange, onChangeView) {
+  constructor(movieData, commentsData, container, onDataChangeMain, onChangeView) {
     this._movieData = movieData;
     this._commentsData = commentsData;
     this._container = container;
     this._mainContainer = document.body;
-    this._movie = new MovieCard(this._movieData);
     this._unrenderMovieDetails = this._unrenderMovieDetails.bind(this);
-    this._movieDetails = new MovieDetailsController(this._movieData, this._commentsData, this._unrenderMovieDetails);
+    this.onDataChangeMain = onDataChangeMain;
+    this.onDataChange = this.onDataChange.bind(this);
+    this._movie = new MovieCard(this._movieData, this.onDataChange);
+    this._movieDetails = new MovieDetailsController(this._movieData, this._commentsData, this._unrenderMovieDetails, this.onDataChange);
     this._renderMovieDetails = this._renderMovieDetails.bind(this);
   }
 
@@ -20,11 +22,34 @@ export default class MovieController {
   }
 
   _onMovieClick() {
-    this._movie.getElement().addEventListener(`click`, this._renderMovieDetails)
+    // this._movie.getElement().addEventListener(`click`, this._renderMovieDetails);
+    this._movie.getElement().querySelector(`.film-card__poster`)
+      .addEventListener(`click`, this._renderMovieDetails);
+  }
+
+  onDataChange(typeData, data) {
+
+    // if(typeData === DATA_CHANGE.CONTROLS) {
+    //   this._movieData.user_details = user_details;
+    //   console.log(this._movieData.user_details);
+    //   // Обновляется карточка фильма
+    //   this._movie.updateData(typeData, this._movieData.user_details);
+    // }
+    this.onDataChangeMain(typeData, this._movieData.id, data, this);
   }
 
   _renderMovieDetails() {
     this._movieDetails.init(this._mainContainer)
+  }
+
+  _updateData(user_details) {
+    this._movieData.user_details = user_details;
+  }
+
+  update(user_details) {
+    this._updateData(user_details);
+    this._movie.update(user_details);
+    this._movieDetails.update(user_details);
   }
 
   _unrenderMovieDetails() {

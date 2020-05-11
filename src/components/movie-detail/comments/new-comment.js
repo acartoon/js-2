@@ -13,7 +13,7 @@ export default class NewComment extends AbstractComponent {
   init(container) {
     this._container = container;
     this._render();
-    render(this._container, this.getElement())
+    render(this._container, this.getElement());
   }
 
   _render() {

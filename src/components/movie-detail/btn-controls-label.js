@@ -12,7 +12,6 @@ export default class BtnControlsLabel extends AbstractComponent {
 
   _onClick() {
     this.getElement().addEventListener(`click`, () => {
-      console.log(this._name)
       this._onDataChange(this._name);
     });
   }

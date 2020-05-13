@@ -20,7 +20,6 @@ export default class CommentsController{
   }
 
   unrender() {
-    console.log(`se;lfs;fdgk;alsdgk;`)
     unrender(this._movieCommentsContainer.getElement());
     this._movieCommentsContainer.removeElement();
     unrender(this._commentsList.getElement());

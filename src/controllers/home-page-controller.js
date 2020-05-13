@@ -79,12 +79,12 @@ export default class HomePageController {
     this._movieData[index].user_details = user_details;
   }
 
-  update(movie, movieId, user_details) {
+  update(typeData, movie, movieId, user_details) {
     this._updateData(movieId, user_details);
 
-    this._mainBoard.update(movie, movieId, user_details);
-    this._topRated.update(movie, movieId, user_details);
-    this._mostCommented.update(movie, movieId, user_details);
+    this._mainBoard.update(typeData, movie, movieId, user_details);
+    this._topRated.update(typeData, movie, movieId, user_details);
+    this._mostCommented.update(typeData, movie, movieId, user_details);
   }
 
   _getMainBoardData(fulterType) {

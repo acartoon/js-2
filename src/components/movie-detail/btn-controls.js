@@ -53,7 +53,6 @@ export default class BtnControls extends AbstractComponent {
       data = !this._favorite
     }
 
-    // this.update(this._watchlist, this._already_watched, this._favorite);
     this.onDataChangeMain(value, data);
   }
 
@@ -64,7 +63,6 @@ export default class BtnControls extends AbstractComponent {
   }
 
   update(watchlist, already_watched, favorite) {
-    console.log('')
     // this._watchlist = watchlist;
     // this._already_watched = already_watched;
     // this._favorite = favorite;

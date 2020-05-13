@@ -24,11 +24,6 @@ export default class MovieBoard {
 
   onDataChange(typeData, movieId, data, movie) {
     this._onDataChangeMain(typeData, movieId, data, movie);
-
-    // const index = this._movieData.findIndex((i) => i.id === movieId);
-    // console.log(this._movieData);
-    // this._movieData[index].user_details = userDetails;
-
   }
 
   _renderContainer() {
@@ -54,36 +49,24 @@ export default class MovieBoard {
     this._movieData[index].user_details = user_details;
   }
 
-  update(movie, movieId, user_details) {
+  update(typeData, movie, movieId, user_details) {
     const index = this._movieData.findIndex((i) => i.id === movieId);
-    console.log(index);
     if(index === -1) {
       return;
     }
     this._movieData[index].user_details = user_details;
-    // MovieController
-    // movie.update(user_details);
 
     this._subscriptions.forEach((movieCard) => {
       if(movieCard._movieData.id === movieId)
-      movieCard.update(user_details)
+      movieCard.update(typeData, user_details)
     });
+    // this._updateMovieBoard(typeData, movieId, user_details);
   }
 
-  onChangeView(movieId) {
+  _updateMovieBoard(typeData, movieId, user_details) {
     this._subscriptions.forEach((movieCard) => {
       if(movieCard._movieData.id === movieId)
-      movieCard.update(user_details)
+      movieCard.update(typeData, user_details)
     });
   }
-
-  // update(movieData) {
-  //   this._movieListContainer.getElement().querySelector('.films-list__container').innerHTML = ``;
-  //   this._movieData = movieData;
-  //   this._renderMovie();
-  // }
-
-  // hide() {
-  //   hideElement(this._movieListContainer.getElement());
-  // }
 }

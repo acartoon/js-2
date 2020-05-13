@@ -12,7 +12,7 @@ export default class MovieController {
     this.onDataChangeMain = onDataChangeMain;
     this.onDataChange = this.onDataChange.bind(this);
     this._movie = new MovieCard(this._movieData, this.onDataChange);
-    this._movieDetails = new MovieDetailsController(this._movieData, this._commentsData, this._unrenderMovieDetails, this.onDataChange);
+    // this._movieDetails = new MovieDetailsController(this._movieData, this._commentsData, this._unrenderMovieDetails, this.onDataChange);
     this._renderMovieDetails = this._renderMovieDetails.bind(this);
   }
 
@@ -28,32 +28,29 @@ export default class MovieController {
   }
 
   onDataChange(typeData, data) {
-
-    // if(typeData === DATA_CHANGE.CONTROLS) {
-    //   this._movieData.user_details = user_details;
-    //   console.log(this._movieData.user_details);
-    //   // Обновляется карточка фильма
-    //   this._movie.updateData(typeData, this._movieData.user_details);
-    // }
     this.onDataChangeMain(typeData, this._movieData.id, data, this);
   }
 
   _renderMovieDetails() {
-    this._movieDetails.init(this._mainContainer)
+    this._movieDetails = new MovieDetailsController(this._movieData, this._commentsData, this._unrenderMovieDetails, this.onDataChange);
+    this._movieDetails.init(this._mainContainer);
   }
 
   _updateData(user_details) {
     this._movieData.user_details = user_details;
   }
 
-  update(user_details) {
+  update(typeData, user_details) {
     this._updateData(user_details);
     this._movie.update(user_details);
-    this._movieDetails.update(user_details);
+    if(this._movieDetails) {
+      this._movieDetails.update(typeData, user_details);
+    }
   }
 
   _unrenderMovieDetails() {
     document.body.classList.remove(`hide-overflow`);
-    this._movieDetails.unrender()
+    this._movieDetails.unrender();
+    this._movieDetails = null;
   }
 }

@@ -47,9 +47,9 @@ export default class MainPageController {
     } else if(typeData === DATA_CHANGE.REMOVE_COMMENT) {
 
     } else if(typeData === DATA_CHANGE.RATING) {
-
+      this._movieData[index].user_details.personal_rating = data;
     }
-    this._activeWindow.update(movie, movieId, this._movieData[index].user_details);
+    this._activeWindow.update(typeData, movie, movieId, this._movieData[index].user_details);
   }
 
   _onMainBtnClick(filterType) {

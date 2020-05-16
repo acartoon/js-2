@@ -1,5 +1,6 @@
 import AbstractComponent from '../../abstract-component.js';
 import moment from 'moment';
+import { DATA_CHANGE } from '../../../utils.js';
 
 export default class CommentComponent extends AbstractComponent {
   // constructor(data, onDataChange) {
@@ -32,10 +33,10 @@ export default class CommentComponent extends AbstractComponent {
   }
 
   _onClick() {
-    const deleteDtn = this.getElement().querySelector(`.film-details__comment-delete`);
-    deleteDtn.addEventListener(`click`, (evt) => {
+    const deleteBtn = this.getElement().querySelector(`.film-details__comment-delete`);
+    deleteBtn.addEventListener(`click`, (evt) => {
       evt.preventDefault();
-      this._onDataChange(`comment`, this._id);
+      this._onDataChange(DATA_CHANGE.REMOVE_COMMENT, this._id);
     });
   }
 }

@@ -1,5 +1,5 @@
 import MovieCard from "../components/movie-card";
-import { render, Position, unrender, DATA_CHANGE } from "../utils";
+import { render, Position, DATA_CHANGE_USER_DETAILS, DATA_CHANGE_COMMENTS, RATING} from "../utils";
 import MovieDetailsController from "./movie-details-controller";
 
 export default class MovieController {
@@ -32,19 +32,31 @@ export default class MovieController {
   }
 
   _renderMovieDetails() {
+    console.log(this._commentsData)
     this._movieDetails = new MovieDetailsController(this._movieData, this._commentsData, this._unrenderMovieDetails, this.onDataChange);
     this._movieDetails.init(this._mainContainer);
   }
 
-  _updateData(user_details) {
-    this._movieData.user_details = user_details;
+  _updateData(typeData, data) {
+    if(typeData === DATA_CHANGE_COMMENTS) {
+      this._movieData.comments = data.DATA_CHANGE_USER_DETAILS;
+      this._commentsData = data.DATA_CHANGE_COMMENTS;
+    } else if (typeData === DATA_CHANGE_USER_DETAILS || typeData === RATING) {
+      this._movieData.user_details = data;
+    }
   }
 
-  update(typeData, user_details) {
-    this._updateData(user_details);
-    this._movie.update(user_details);
+  update(typeData, data) {
+    this._updateData(typeData, data);
+    console.log(typeData)
+
+    if(typeData === DATA_CHANGE_USER_DETAILS || typeData === RATING) {
+      this._movie.update(typeData, this._movieData.user_details);
+    } else if (typeData === DATA_CHANGE_COMMENTS) {
+      this._movie.update(typeData, this._movieData.comments);
+    }
     if(this._movieDetails) {
-      this._movieDetails.update(typeData, user_details);
+      this._movieDetails.update(typeData, data);
     }
   }
 

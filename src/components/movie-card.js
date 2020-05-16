@@ -1,15 +1,11 @@
-// import MovieBaseComponent from './movie-base-component.js';
-// import MovieBtnState from './movie-btn-state.js';
-import {render, unrender, BTN_CARD_CONTROLS, DATA_CHANGE, MOVIE_DETAIL_BTN_CONTROLS} from '../utils.js';
+import {render, unrender, BTN_CARD_CONTROLS, DATA_CHANGE_USER_DETAILS, DATA_CHANGE_COMMENTS} from '../utils.js';
 import moment from 'moment';
 import MovieBaseComponent from './movie-base-component.js';
 import MovieBtnControls from './movie-btn-controls.js';
-// import MovieCommentsCount from './movie-comments-count';
 
 export default class MovieCard extends MovieBaseComponent {
   constructor(data, onDataChange) {
     super(data);
-    // this._onDataChangeMain = onDataChangeMain;
     this.onDataChange = onDataChange;
     this._movieCommentsCount = null;
 
@@ -18,26 +14,33 @@ export default class MovieCard extends MovieBaseComponent {
 
   _init() {
     this._renderBtnControls(this._user_details);
-    // this.renderCommentsCount(this._comments.length);
   }
 
-  renderCommentsCount(commentsCount) {
-    this._movieCommentsCount = new MovieCommentsCount(commentsCount);
-    this.getElement().querySelector(`.film-card__controls`).before(this._movieCommentsCount.getElement());
+
+  _updateData(typeData, data) {
+    if(typeData === DATA_CHANGE_USER_DETAILS) {
+      this._user_details = data
+    } else if(typeData === DATA_CHANGE_COMMENTS ) {
+      this._comments = data;
+    }
   }
 
-  _updateData(user_details) {
-    this._user_details = user_details;
-  }
-
-  update(user_details) {
-    this._updateData(user_details);
-    this._updateBtnControls();
+  update(typeData, data) {
+    this._updateData(typeData, data);
+    if(typeData === DATA_CHANGE_USER_DETAILS) {
+      this._updateBtnControls();
+    } else if(typeData === DATA_CHANGE_COMMENTS ) {
+      this._updateCommentsCount(this._comments.length)
+    }
   }
 
   _updateBtnControls() {
     this.getElement().querySelector(`.film-card__controls`).innerHTML = ``;
     this._renderBtnControls();
+  }
+
+  _updateCommentsCount(count) {
+    this.getElement().querySelector(`.film-card__comments`).innerHTML = `${count} comments`;
   }
 
   _renderBtnControls() {
@@ -59,6 +62,7 @@ export default class MovieCard extends MovieBaseComponent {
     </p>
     <img src="${this._poster}" alt="" class="film-card__poster">
     <p class="film-card__description">${this._description.length < 140 ? this._description : `${this._description.slice(0, 139).trim()}…`}</p>
+    <a class="film-card__comments">${this._comments.length} comments</a>
     <form class="film-card__controls"></form>
     </article>`;
   }

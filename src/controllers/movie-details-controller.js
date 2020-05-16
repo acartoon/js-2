@@ -1,4 +1,4 @@
-import {render, KEY_CODE, unrender, USER_RATING_COUNT, DATA_CHANGE} from '../utils.js';
+import {render, KEY_CODE, unrender, USER_RATING_COUNT, DATA_CHANGE, DATA_CHANGE_USER_DETAILS, DATA_CHANGE_TYPE, DATA_CHANGE_COMMENTS, RATING} from '../utils.js';
 import moment from 'moment';
 import MovieDetails from '../components/movie-detail/movie-details.js';
 import BtnControls from '../components/movie-detail/btn-controls.js';
@@ -13,8 +13,8 @@ export default class MovieDetailsController{
     this._onCloseBtnClick = this._onCloseBtnClick.bind(this);
     this._onEscKeyDown = this._onEscKeyDown.bind(this);
     this._movie = new MovieDetails(this._movieData);
-    this._comments = new CommentsController(this._commentsData);
     this.onDataChange = onDataChange.bind(this);
+    this._comments = new CommentsController(this._commentsData, this.onDataChange);
     this._closeBtn = this._movie.getElement().querySelector(`.film-details__close-btn`);
     this._containerRating = this._movie.getElement().querySelector(`.form-details__middle-container`);
     this._btnControls = null;
@@ -75,21 +75,31 @@ export default class MovieDetailsController{
     this._btnControls.init(container);
   }
 
-  _updateData(user_details) {
-    this._movieData.user_details = user_details;
+  _updateData(typeData, data) {
+    if(typeData === DATA_CHANGE_COMMENTS) {
+      this._movieData.comments = data.DATA_CHANGE_USER_DETAILS;
+      this._commentsData = data.DATA_CHANGE_COMMENTS;
+    } else if (typeData === DATA_CHANGE_USER_DETAILS) {
+      this._movieData.user_details = data;
+    }
   }
 
-  update(typeData, user_details) {
-    this._updateData(user_details);
+  update(typeData, data) {
+    this._updateData(typeData, data);
 
-    if(typeData === DATA_CHANGE.RATING) {
-      this._userRating.update(this._movieData.user_details.personal_rating);
-    } else if (typeData === DATA_CHANGE.CREATE_COMMENT) {
-
-    } else if (typeData === DATA_CHANGE.WATCHLIST ||  typeData === DATA_CHANGE.FAVORITE ||  typeData === DATA_CHANGE.ALREADY_WATCHED) {
-      //хотелось бы поправить вот это условие!
-      this._btnControls.update(this._movieData.user_details.watchlist, this._movieData.user_details.already_watched, this._movieData.user_details.favorite)
-      this._toggleUserRating();
+    switch (typeData) {
+      case DATA_CHANGE_USER_DETAILS:
+        this._btnControls.update(this._movieData.user_details.watchlist, this._movieData.user_details.already_watched, this._movieData.user_details.favorite)
+        this._toggleUserRating();
+        break;
+      case DATA_CHANGE_COMMENTS:
+        this._comments.update(this._commentsData);
+        break;
+      case RATING:
+        if(this._userRating) {
+          this._userRating.update(this._movieData.user_details.personal_rating);
+        }
+        break;
     }
   }
 
@@ -103,7 +113,7 @@ export default class MovieDetailsController{
     elem.removeElement();
   }
 
-    unrender() {
+  unrender() {
     this._comments.unrender();
     this._remove(this._movie);
     this._remove(this._btnControls);

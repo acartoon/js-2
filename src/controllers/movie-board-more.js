@@ -15,6 +15,7 @@ export default class MovieBoardMore extends MovieBoard {
     this._renderContainer();
     this._countMovieToRender = this._STEP_TO_RENDER;
     const movieToRender = this._movieData.slice(0, this._countMovieToRender);
+    console.log(movieToRender)
     this._renderMovie(movieToRender);
 
     if(this._movieData.length > this._STEP_TO_RENDER) {

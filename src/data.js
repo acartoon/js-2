@@ -6,7 +6,7 @@ import {
   getRandomTime,
   getCountFilms,
   generateComments,
-  emojis,
+  EMOJIS,
   getRandomString,
   namesPeople
 } from './utils.js';
@@ -66,12 +66,19 @@ const generateMovie = () => ({
     }
 });
 
+const creareRandomEmojis = () => {
+  const em = Object.keys(EMOJIS);
+  const value = em[getRandomInteger(0, em.length)];
+  return EMOJIS[value];
+};
+
 const getComment = () => ({
   id: getRandomString(3),
   comment: getDescriptionFilm(description),
   author: Array.from(namesPeople)[getRandomInteger(Array.from(namesPeople).length-1)],
   date: getRandomInteger(10, 2),
-  emotion: emojis[getRandomInteger(0, 3)],
+  emotion: creareRandomEmojis(),
+  // emotion: emojis[getRandomInteger(0, 3)],
 });
 
 

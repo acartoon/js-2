@@ -2,25 +2,44 @@ import moment from "moment";
 
 export const KEY_CODE = {
   ESC: `Escape`,
+  CONTROL: `Control`,
+  ENTER: `Enter`,
+}
+
+export const DATA_CHANGE_COMMENTS = `comments`;
+export const DATA_CHANGE_USER_DETAILS = `user_details`;
+export const RATING = `RATING`;
+export const USER_RATING_COUNT = 9;
+
+
+export const DATA_CHANGE_TYPE = {
+  RATING: RATING,
+  WATCHLIST: DATA_CHANGE_USER_DETAILS,
+  FAVORITE: DATA_CHANGE_USER_DETAILS,
+  ALREADY_WATCHED: DATA_CHANGE_USER_DETAILS,
+  CREATE_COMMENT: DATA_CHANGE_COMMENTS,
+  REMOVE_COMMENT: DATA_CHANGE_COMMENTS,
 }
 
 export const DATA_CHANGE = {
-  RATING: `rating`,
-  CONTROLS: `controls`,
-  WATCHLIST: `watchlist`,
-  FAVORITE: `favorite`,
-  ALREADY_WATCHED: `watched`,
-  CREATE_COMMENT : `create_comment`,
-  REMOVE_COMMENT : `remove_comment`,
+  RATING: `RATING`,
+  WATCHLIST: `WATCHLIST`,
+  FAVORITE: `FAVORITE`,
+  ALREADY_WATCHED: `ALREADY_WATCHED`,
+  CREATE_COMMENT : `CREATE_COMMENT`,
+  REMOVE_COMMENT : `REMOVE_COMMENT`,
+  // CONTROLS: `CONTROLS`,
+  // USER_DETAILS: `user_details`,
+  // COMMENTS : `comments`,
 }
+
 
 export const MOVIE_DETAIL_BTN_CONTROLS = {
-  WATCHLIST: {name: `watchlist`, label: `Add to watchlist`},
-  ALREADY_WATCHED: {name: `watched`, label: `Already watched`},
-  FAVORITE: {name: `favorite`, label: `Add to favorites`},
+  WATCHLIST: {name: `watchlist`, label: `Add to watchlist`, dataType:  DATA_CHANGE.WATCHLIST},
+  ALREADY_WATCHED: {name: `watched`, label: `Already watched`, dataType:  DATA_CHANGE.ALREADY_WATCHED},
+  FAVORITE: {name: `favorite`, label: `Add to favorites`, dataType:  DATA_CHANGE.FAVORITE},
 }
 
-export const USER_RATING_COUNT = 9;
 
 export const windows = {
   MAIN: `main`,
@@ -33,7 +52,12 @@ export const filterFlag = {
   save: `save`,
 }
 
-export const emojis = [`smile`, `sleeping`, `puke`, `angry`];
+export const EMOJIS = {
+  SMILE: `smile`,
+  SLEPPING: `sleeping`,
+  PUKE: `puke`,
+  ANGRY: `angry`,
+}
 
 // меню
 export const FILTER_TYPE = {
@@ -46,37 +70,15 @@ export const FILTER_TYPE = {
 
 //главная страница
 export const BOARDS_LIST = {
-  ALL: {
-    isExtra: false,
-    title: `All movies. Upcoming`,
-  },
-  TOP_RATED: {
-    isExtra: true,
-    title: `Top rated`,
-  },
-  MOST_COMMENTED: {
-    isExtra: true,
-    title: `Most commented`,
-  },
+  ALL: {isExtra: false, title: `All movies. Upcoming`},
+  TOP_RATED: {isExtra: true, title: `Top rated`},
+  MOST_COMMENTED: {isExtra: true,  title: `Most commented`},
 }
 
-//кнопки карточки фильма в списке
 export const BTN_CARD_CONTROLS = {
-  watchlist: {
-    state: `watchlist`,
-    classBtn: `add-to-watchlist`,
-    title: `Add to watchlist`
-  },
-  already_watched: {
-    state: `watched`,
-    classBtn: `mark-as-watched`,
-    title: `Mark as watched`
-  },
-  favorite: {
-    state: `favorite`,
-    classBtn: `favorite`,
-    title: `Mark as favorite`
-  },
+  watchlist: {classBtn: `add-to-watchlist`, title: `Add to watchlist`, dataType: DATA_CHANGE.WATCHLIST},
+  already_watched: {classBtn: `mark-as-watched`, title: `Mark as watched`, dataType: DATA_CHANGE.ALREADY_WATCHED},
+  favorite: {classBtn: `favorite`, title: `Mark as favorite`, dataType: DATA_CHANGE.FAVORITE},
 }
 
 export const namesPeople = new Set([

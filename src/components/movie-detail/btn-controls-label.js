@@ -1,18 +1,18 @@
 import AbstractComponent from '../abstract-component.js';
-import { DATA_CHANGE } from '../../utils.js';
 
 export default class BtnControlsLabel extends AbstractComponent {
-  constructor({name, label}, onDataChange) {
+  constructor({name, label, dataType}, onDataChange) {
     super();
     this._name = name;
     this._label = label;
+    this._dataType = dataType;
     this._onDataChange = onDataChange.bind(this);
     this._onClick();
   }
 
   _onClick() {
     this.getElement().addEventListener(`click`, () => {
-      this._onDataChange(this._name);
+      this._onDataChange(this._dataType);
     });
   }
 

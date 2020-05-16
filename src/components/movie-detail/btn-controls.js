@@ -45,14 +45,14 @@ export default class BtnControls extends AbstractComponent {
   //при срабатывании onDataChange из main вернется срабатываение функции update
   onDataChange(value) {
     let data = null;
-    if(value === MOVIE_DETAIL_BTN_CONTROLS.WATCHLIST.name) {
+    if(value === DATA_CHANGE.WATCHLIST) {
       data = !this._watchlist
-    } else if(value ===  MOVIE_DETAIL_BTN_CONTROLS.ALREADY_WATCHED.name) {
+    } else if(value ===  DATA_CHANGE.ALREADY_WATCHED) {
       data = !this._already_watched
-    } else if(value === MOVIE_DETAIL_BTN_CONTROLS.FAVORITE.name) {
+    } else if(value === DATA_CHANGE.FAVORITE) {
       data = !this._favorite
     }
-
+    console.log(value)
     this.onDataChangeMain(value, data);
   }
 

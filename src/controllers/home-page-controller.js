@@ -1,5 +1,5 @@
 import MovieContainer from "../components/movie-container";
-import { render, Position, BOARDS_LIST, hideElement, filterFlag } from "../utils";
+import { render, Position, BOARDS_LIST, hideElement, filterFlag, RATING, DATA_CHANGE_COMMENTS, DATA_CHANGE_USER_DETAILS} from "../utils";
 import MovieBoard from "./movie-board";
 import BtnShowMore from "../components/btn-show-more";
 import MovieBoardMore from "./movie-board-more";
@@ -43,7 +43,7 @@ export default class HomePageController {
   }
 
   _getTopRatedMovie(movieData) {
-    const topRatedMovie = movieData.slice().sort((a, b) => b.film_info.total_rating - a.film_info.total_rating);
+    const topRatedMovie = movieData.slice().sort((a, b) => b.user_details.personal_rating - a.user_details.personal_rating);
      return topRatedMovie.slice(0, this._EXTRA_COUNT_MOVIE)
   }
 
@@ -61,30 +61,36 @@ export default class HomePageController {
       date: this._mainBoardData.slice().sort((a, b) => a.film_info.release.date - b.film_info.release.date),
       rating: this._mainBoardData.slice().sort((a, b) => b.film_info.total_rating - a.film_info.total_rating),
       default: this._mainBoardData,
-      // 'comments': movieData.slice().sort((a, b) => b.comments.length - a.comments.length),
     };
     this._rerendMainBoard(movieDataToRender[sortType], filterFlag.save);
   }
 
   onDataChange(typeData, movieId, data, movie) {
     this._onDataChangeMain(typeData, movieId, data, movie);
-
-    // const index = this._movieData.findIndex((i) => i.id === movieId);
-    // this._movieData[index].user_details = userDetails;
-    // console.log(this._movieData);
   }
 
-  _updateData(movieId, user_details) {
+  _updateData(typeData, movieId, data) {
     const index = this._movieData.findIndex((i) => i.id === movieId);
-    this._movieData[index].user_details = user_details;
+    if(typeData === DATA_CHANGE_COMMENTS) {
+      this._movieData[index].comments = data[DATA_CHANGE_USER_DETAILS];
+      this._commentsData = data[DATA_CHANGE_COMMENTS];
+
+    } else if(typeData === DATA_CHANGE_USER_DETAILS || typeData === RATING) {
+      this._movieData[index].user_details = data;
+    }
   }
 
-  update(typeData, movie, movieId, user_details) {
-    this._updateData(movieId, user_details);
-
-    this._mainBoard.update(typeData, movie, movieId, user_details);
-    this._topRated.update(typeData, movie, movieId, user_details);
-    this._mostCommented.update(typeData, movie, movieId, user_details);
+  update(typeData, movie, movieId, data) {
+    this._updateData(typeData, movieId, data);
+    this._mainBoard.updateMovie(typeData, movie, movieId, data);
+    this._topRated.updateMovie(typeData, movie, movieId, data);
+    this._mostCommented.updateMovie(typeData, movie, movieId, data);
+    if(typeData === DATA_CHANGE_COMMENTS) {
+      this._mostCommented.updateBoard(this._getMostCommentedMovie(this._movieData), this._commentsData);
+    }
+    if(typeData === RATING) {
+      this._topRated.updateBoard(this._getMostCommentedMovie(this._movieData), this._commentsData);
+    }
   }
 
   _getMainBoardData(fulterType) {

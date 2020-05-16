@@ -1,7 +1,7 @@
 import HomePageController from "./home-page-controller.js";
 import Search from "../components/search.js";
 import Profile from "../components/profile.js";
-import { render, DATA_CHANGE } from "../utils.js";
+import { render, DATA_CHANGE, DATA_CHANGE_TYPE, DATA_CHANGE_USER_DETAILS, DATA_CHANGE_COMMENTS } from "../utils.js";
 import MainNavController from "./main-nav-controller.js";
 import FilterController from "./filter-controller.js";
 
@@ -33,23 +33,53 @@ export default class MainPageController {
   }
 
   onDataChange(typeData, movieId, data, movie) {
-
+    //подумать об оптимизации этого ужаса
+    console.log(typeData)
     const index = this._movieData.findIndex((i) => i.id === movieId);
+    let dataChange;
 
-    if(typeData === DATA_CHANGE.WATCHLIST) {
-      this._movieData[index].user_details.watchlist = data;
-    } else if(typeData === DATA_CHANGE.FAVORITE) {
-      this._movieData[index].user_details.favorite = data;
-    } else if(typeData === DATA_CHANGE.ALREADY_WATCHED) {
-      this._movieData[index].user_details.already_watched = data;
-    } else if(typeData === DATA_CHANGE.CREATE_COMMENT) {
 
-    } else if(typeData === DATA_CHANGE.REMOVE_COMMENT) {
-
-    } else if(typeData === DATA_CHANGE.RATING) {
-      this._movieData[index].user_details.personal_rating = data;
+    switch (typeData) {
+      case DATA_CHANGE.WATCHLIST:
+        this._movieData[index].user_details.watchlist = data;
+        dataChange = this._movieData[index].user_details;
+        break;
+      case DATA_CHANGE.FAVORITE:
+        this._movieData[index].user_details.favorite = data;
+        dataChange = this._movieData[index].user_details;
+        break;
+      case DATA_CHANGE.ALREADY_WATCHED:
+        this._movieData[index].user_details.already_watched = data;
+        dataChange = this._movieData[index].user_details;
+        if(!this._movieData[index].user_details.already_watched) {
+          this._movieData[index].user_details.personal_rating = null;
+          this._movieData[index].user_details.watching_date = null;
+        }
+        break;
+      case DATA_CHANGE.CREATE_COMMENT:
+        this._movieData[index].comments.unshift(data.id)
+        this._commentsData.unshift(data);
+        dataChange = {};
+        dataChange[DATA_CHANGE_USER_DETAILS] = this._movieData[index].comments;
+        dataChange[DATA_CHANGE_COMMENTS] = this._commentsData;
+        console.log(this._commentsData)
+        break;
+      case DATA_CHANGE.REMOVE_COMMENT:
+        const commentIndex = this._movieData[index].comments.findIndex((i) => i === data);
+        const commentIndex1 = this._commentsData.findIndex((i) => i.id === data);
+        this._movieData[index].comments.splice(commentIndex, 1);
+        this._commentsData.splice(commentIndex1, 1);
+        dataChange = {};
+        dataChange[DATA_CHANGE_USER_DETAILS] = this._movieData[index].comments;
+        dataChange[DATA_CHANGE_COMMENTS] = this._commentsData;
+        break;
+        case DATA_CHANGE.RATING:
+          this._movieData[index].user_details.personal_rating = data;
+          this._movieData[index].user_details.watching_date = new Date();
+          dataChange = this._movieData[index].user_details;
+          break;
     }
-    this._activeWindow.update(typeData, movie, movieId, this._movieData[index].user_details);
+    this._activeWindow.update(DATA_CHANGE_TYPE[typeData], movie, movieId, dataChange);
   }
 
   _onMainBtnClick(filterType) {

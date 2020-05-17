@@ -1,16 +1,20 @@
 import moment from "moment";
 
+export const DATA_CHANGE_COMMENTS = `comments`;
+export const DATA_CHANGE_USER_DETAILS = `user_details`;
+export const RATING = `RATING`;
+export const USER_RATING_COUNT = 9;
+
 export const KEY_CODE = {
   ESC: `Escape`,
   CONTROL: `Control`,
   ENTER: `Enter`,
 }
 
-export const DATA_CHANGE_COMMENTS = `comments`;
-export const DATA_CHANGE_USER_DETAILS = `user_details`;
-export const RATING = `RATING`;
-export const USER_RATING_COUNT = 9;
-
+export const Position = {
+  AFTERBEGIN: `afterbegin`,
+  BEFOREEND: `beforeend`,
+};
 
 export const DATA_CHANGE_TYPE = {
   RATING: RATING,
@@ -28,9 +32,6 @@ export const DATA_CHANGE = {
   ALREADY_WATCHED: `ALREADY_WATCHED`,
   CREATE_COMMENT : `CREATE_COMMENT`,
   REMOVE_COMMENT : `REMOVE_COMMENT`,
-  // CONTROLS: `CONTROLS`,
-  // USER_DETAILS: `user_details`,
-  // COMMENTS : `comments`,
 }
 
 
@@ -39,7 +40,6 @@ export const MOVIE_DETAIL_BTN_CONTROLS = {
   ALREADY_WATCHED: {name: `watched`, label: `Already watched`, dataType:  DATA_CHANGE.ALREADY_WATCHED},
   FAVORITE: {name: `favorite`, label: `Add to favorites`, dataType:  DATA_CHANGE.FAVORITE},
 }
-
 
 export const windows = {
   MAIN: `main`,
@@ -105,17 +105,14 @@ export function getRandomString(length) {
   return result;
 }
 
-export const getRandomTime = () => {
-  // let munute = getRandomInteger(180, 65);
-  // return `${Math.floor(munute / 60)} h ${Math.floor(munute % 60)} m`;
-  return getRandomInteger(180, 65);
-};
+export const getRandomTime = () => getRandomInteger(180, 65);
 
 export const getDescriptionFilm = (description) => {
   const descriptionArray = getRandomElements(description.split(`. `), getRandomInteger(3, 1), getRandomInteger);
   return `${descriptionArray.join(`.`)}.`;
 };
 
+//возвращает отфильтрованный массив комментариев
 export const getComments = (commentsId, commentsData) => {
   return commentsId.reduce((array, commentId) => {
     const comment = commentsData.filter((comment) => comment.id === commentId);
@@ -130,10 +127,12 @@ export function getRandomDate() {
   return new Date(randomYear, randomMonth, randomDate);
 }
 
+// количество фильтров согласно ключу
 export const getCountFilms = (movieData, key) => {
   return movieData.reduce((total, movie) => (movie['user_details'][key] ? total + 1 : total), 0);
 };
 
+//возвращает список комментариев с привязкой к id фильма
 export const generateComments = (movieData, getComment) => {
   return movieData.reduce((AllComments, movie) => {
     let movieComments = new Array(getRandomInteger(4)).fill(``).map(getComment);
@@ -153,11 +152,6 @@ export const createElement = (template) => {
   const newElement = document.createElement(`div`);
   newElement.innerHTML = template;
   return newElement.lastChild;
-};
-
-export const Position = {
-  AFTERBEGIN: `afterbegin`,
-  BEFOREEND: `beforeend`,
 };
 
 export const render = (container, element, place = `beforeend`) => {
@@ -201,4 +195,8 @@ export const durationMovie = (movieData) => {
 
 export const hideElement = (element) => {
   element.classList.add(`visually-hidden`)
+}
+
+export const showElement = (element) => {
+  element.classList.remove(`visually-hidden`)
 }

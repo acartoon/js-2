@@ -1,4 +1,5 @@
 import AbstractComponent from './abstract-component.js';
+import { hideElement } from '../utils.js';
 
 export default class Sort extends AbstractComponent {
   constructor(onClick) {
@@ -24,7 +25,17 @@ export default class Sort extends AbstractComponent {
     });
   }
 
-  default() {
+  hide() {
+    hideElement(this.getElement());
+  }
+
+  show() {
+    showElement(this.getElement());
+    this._default()
+  }
+
+
+  _default() {
     const defaultActiveElem = this.getElement().querySelector(`[data-sort-type="default"]`);
     this._renderActiveElement(defaultActiveElem)
   }

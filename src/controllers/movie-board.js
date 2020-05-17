@@ -1,11 +1,10 @@
 import { render, Position, hideElement, getComments, RATING, DATA_CHANGE_COMMENTS, DATA_CHANGE_USER_DETAILS } from "../utils";
 import MovieList from "../components/movie-list";
-import MovieCard from "../components/movie-card";
 import MovieController from "./movie-controller";
 
 
 export default class MovieBoard {
-  constructor({isExtra, title}, movieData, commentsData, container, onDataChangeMain) {
+  constructor({isExtra, title}, movieData, commentsData, container, onDataChangeMain, position) {
     this._container = container;
     this._movieData = movieData;
     this._commentsData = commentsData;
@@ -16,6 +15,7 @@ export default class MovieBoard {
     this.onDataChange = this.onDataChange.bind(this);
     this._boardContainer = this._movieListContainer.getElement().querySelector('.films-list__container');
     this._subscriptions = [];
+    this._position = position;
   }
 
   init() {
@@ -27,13 +27,16 @@ export default class MovieBoard {
     this._onDataChangeMain(typeData, movieId, data, movie);
   }
 
+  hide() {
+    hideElement(this._movieListContainer.getElement());
+  }
+
   _renderContainer() {
-    render(this._container, this._movieListContainer.getElement(), Position.BEFOREEND);
+    render(this._container, this._movieListContainer.getElement(), this._position);
   }
 
   _renderMovie(movieData) {
     movieData.forEach((movie) => {
-      const container = this._movieListContainer.getElement().querySelector('.films-list__container');
       const comments = getComments(movie.comments, this._commentsData);
       const movieCard = new MovieController(movie, comments, this._boardContainer, this.onDataChange);
       this._subscriptions.push(movieCard);

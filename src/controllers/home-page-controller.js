@@ -16,7 +16,7 @@ export default class HomePageController {
     this._mainBoardData = [];
     this._filterType = 'all';
     this._onDataChangeMain = onDataChangeMain;
-    this.onDataChange = this.onDataChange.bind(this)
+    this.onDataChange = this.onDataChange.bind(this);
   }
 
   init(movieData, commentsData) {
@@ -44,12 +44,12 @@ export default class HomePageController {
 
   _getTopRatedMovie(movieData) {
     const topRatedMovie = movieData.slice().sort((a, b) => b.user_details.personal_rating - a.user_details.personal_rating);
-     return topRatedMovie.slice(0, this._EXTRA_COUNT_MOVIE)
+    return topRatedMovie.slice(0, this._EXTRA_COUNT_MOVIE)
   }
 
   _getMostCommentedMovie(movieData) {
     const mostCommentedMovie =  movieData.slice().sort((a, b) => b.comments.length - a.comments.length);
-     return mostCommentedMovie.slice(0, this._EXTRA_COUNT_MOVIE);
+    return mostCommentedMovie.slice(0, this._EXTRA_COUNT_MOVIE);
   }
 
   _rerendMainBoard(movieData, flag) {
@@ -104,11 +104,12 @@ export default class HomePageController {
   }
 
   hide() {
-
+    this._sort.hide();
+    this._topRated.hide();
+    this._mostCommented.hide();
   }
 
   show(movieData, filterType) {
-    this._sort.default();
     this._movieData = movieData;
     this._mainBoardData = this._getMainBoardData(filterType);
     this._rerendMainBoard(this._mainBoardData, filterFlag.reset)

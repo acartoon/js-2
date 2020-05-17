@@ -3,14 +3,13 @@ import Search from "../components/search.js";
 import Profile from "../components/profile.js";
 import { render, DATA_CHANGE, DATA_CHANGE_TYPE, DATA_CHANGE_USER_DETAILS, DATA_CHANGE_COMMENTS } from "../utils.js";
 import MainNavController from "./main-nav-controller.js";
-import FilterController from "./filter-controller.js";
+import SearchController from "./search-controller.js";
 
 export default class MainPageController {
   constructor(container, movieData, commentsData) {
     this._container= container;
     this._movieData = movieData;
     this._commentsData = commentsData;
-    this._search = new Search();
     this._profile = new Profile();
     this._mainContainer = this._container.querySelector('.main');
     this._onMainBtnClick = this._onMainBtnClick.bind(this);
@@ -18,7 +17,9 @@ export default class MainPageController {
     this._homePage = new HomePageController(this._mainContainer, this.onDataChange.bind(this));
     this._activeWindow = null;
     this._filterBoard = null;
-    this._filterController = new FilterController(this._mainContainer);
+    this._searchController = new SearchController(this._mainContainer, this.onDataChange.bind(this));
+    this.initSearch = this.initSearch.bind(this);
+    this._search = new Search(this.initSearch);
   }
 
   init() {
@@ -32,9 +33,14 @@ export default class MainPageController {
     this.onDataChange = this.onDataChange.bind(this);
   }
 
+  initSearch(searchData) {
+    this._mainNavController.hide();
+    this._activeWindow.hide();
+    this._searchController.show(this._movieData, this._commentsData, searchData);
+    this._activeWindow = this._searchController;
+  }
+
   onDataChange(typeData, movieId, data, movie) {
-    //подумать об оптимизации этого ужаса
-    console.log(typeData)
     const index = this._movieData.findIndex((i) => i.id === movieId);
     let dataChange;
 
@@ -62,7 +68,6 @@ export default class MainPageController {
         dataChange = {};
         dataChange[DATA_CHANGE_USER_DETAILS] = this._movieData[index].comments;
         dataChange[DATA_CHANGE_COMMENTS] = this._commentsData;
-        console.log(this._commentsData)
         break;
       case DATA_CHANGE.REMOVE_COMMENT:
         const commentIndex = this._movieData[index].comments.findIndex((i) => i === data);

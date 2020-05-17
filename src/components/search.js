@@ -1,6 +1,23 @@
 import AbstractComponent from './abstract-component.js';
 
 export default class Search extends AbstractComponent {
+  constructor(initSearch) {
+    super();
+    this._initSearch = initSearch;
+    this._onSearchInput = this._onSearchInput.bind(this);
+    this._init();
+  }
+
+  _init() {
+    this.getElement().addEventListener(`input`, this._onSearchInput);
+  };
+
+  _onSearchInput(e) {
+    const searchData = e.target.value;
+    if(searchData.length > 2) {
+      this._initSearch(searchData);
+    }
+  }
 
   getTemplate() {
     return `<form class="header__search search">

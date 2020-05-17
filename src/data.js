@@ -4,7 +4,6 @@ import {
   getRandomDate,
   getRandomInteger,
   getRandomTime,
-  getCountFilms,
   generateComments,
   EMOJIS,
   getRandomString,
@@ -37,7 +36,9 @@ const description = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cr
 const posters = [`./images/posters/made-for-each-other.png`, `./images/posters/popeye-meets-sinbad.png`, `./images/posters/sagebrush-trail.jpg`, `./images/posters/santa-claus-conquers-the-martians.jpg`, `./images/posters/the-dance-of-life.jpg`, `./images/posters/the-great-flamarion.jpg`, `./images/posters/the-man-with-the-golden-arm.jpg`];
 const movie = [];
 
-const generateMovie = () => ({
+
+const getMovie = () => {
+  const movie = {
     id: getRandomString(3),
     comments: [],
     film_info: {
@@ -58,18 +59,26 @@ const generateMovie = () => ({
       description: getDescriptionFilm(description),
     },
     user_details: {
-      personal_rating: getRandomInteger(9),
+      personal_rating: null,
       watchlist: Boolean(Math.round(Math.random())),
       already_watched: Boolean(Math.round(Math.random())),
-      watching_date: getRandomDate(),
+      watching_date: null,
       favorite: Boolean(Math.round(Math.random())),
     }
-});
+  }
+  if(movie.user_details.already_watched) {
+    movie.user_details.personal_rating = getRandomInteger(9);
+    movie.user_details.watching_date = getRandomDate();
+  }
+
+  return movie;
+};
+
 
 const creareRandomEmojis = () => {
-  const em = Object.keys(EMOJIS);
-  const value = em[getRandomInteger(0, em.length)];
-  return EMOJIS[value];
+  const keys = Object.keys(EMOJIS);
+  const ramdomKey = keys[getRandomInteger(0, keys.length)];
+  return EMOJIS[ramdomKey];
 };
 
 const getComment = () => ({
@@ -78,18 +87,17 @@ const getComment = () => ({
   author: Array.from(namesPeople)[getRandomInteger(Array.from(namesPeople).length-1)],
   date: getRandomInteger(10, 2),
   emotion: creareRandomEmojis(),
-  // emotion: emojis[getRandomInteger(0, 3)],
 });
 
-
 for(let i = 0; i < MOVIE_LENGTH; i++ ) {
-  movie.push(generateMovie());
+  movie.push(getMovie());
   movie[i].film_info.title = Array.from(filmNames)[i];
   movie[i].film_info.alternative_title = Array.from(filmNames)[i];
-  // movie[i] = {...movie[i], name: Array.from(filmNames)[i], originalName: Array.from(filmNames)[i]};
 }
+
 const comments = generateComments(movie, getComment);
 
+//добавляет id комментария к массиву с фильмами и удаляет id фильма из комментария
 comments.forEach((comment) => {
   for(let i = 0; i < MOVIE_LENGTH; i++ ) {
     if (comment.idFilm === movie[i].id) {
@@ -98,5 +106,4 @@ comments.forEach((comment) => {
   }
   delete comment.idFilm;
 });
-
 export {movie, comments};

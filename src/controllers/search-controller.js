@@ -2,6 +2,7 @@ import MovieContainer from "../components/movie-container";
 import {render, hideElement, showElement, BOARDS_LIST, Position} from "../utils";
 import ResultTitle from "../components/result-title";
 import MovieBoard from "./movie-board";
+import MovieList from "../components/movie-list";
 
 export default class SearchController {
   constructor(container, onDataChangeMain) {
@@ -12,36 +13,33 @@ export default class SearchController {
     this._searchData = null
     this._init();
     this.onDataChangeMain = onDataChangeMain;
+    this._boardContainer = null;
   }
 
   _init() {
   }
 
-  show(movieData, commentsData, searchData) {
-    this._moviecontainer = this._container.querySelector('.films');
-    this._moviecontainer.firstElementChild.remove();
-    this._show();
+  show(boardContainer, movieData, commentsData, searchData) {
     this._searchData = searchData;
+    this._boardContainer = boardContainer;
+    this._boardContainer.querySelector(`.films-list__container`).innerHTML = ``;
+
 
     const resultData = movieData.filter((movie) => {
-      console.log(movie)
-      console.log(this._searchData)
-      return movie.film_info.title.includes(this._searchData);
+      return movie.film_info.title.toLowerCase().includes(this._searchData.toLowerCase());
     });
 
-    this._movieBoard = new MovieBoard(BOARDS_LIST.ALL, resultData, commentsData, this._moviecontainer, this.onDataChangeMain, Position.AFTERBEGIN);
-    this._movieBoard.init();
+    if(resultData.length !== 0) {
+      this._title.init(resultData.length);
+      this._movieBoard = new MovieBoard(resultData, commentsData, this._boardContainer, this.onDataChangeMain);
+      this._movieBoard.init();
+    } else {
+
+    }
   };
 
   hide() {
     this._title.hide();
-    hideElement(this._moviecontainer.getElement());
-    this._moviecontainer.getElement().remove()
     this._movieBoard = null;
-  }
-
-  _show() {
-    this._title.show();
-    // showElement(this._moviecontainer.getElement());
   }
 }

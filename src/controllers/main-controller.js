@@ -18,8 +18,10 @@ export default class MainPageController {
     this._activeWindow = null;
     this._filterBoard = null;
     this._searchController = new SearchController(this._mainContainer, this.onDataChange.bind(this));
-    this.initSearch = this.initSearch.bind(this);
-    this._search = new Search(this.initSearch);
+    this.onSearchReset = this.onSearchReset.bind(this);
+    this.resetSearch = this.resetSearch.bind(this);
+    this.onSearchInput = this.onSearchInput.bind(this);
+    this._search = new Search(this.onSearchInput, this.onSearchReset, this.resetSearch);
   }
 
   init() {
@@ -33,11 +35,35 @@ export default class MainPageController {
     this.onDataChange = this.onDataChange.bind(this);
   }
 
-  initSearch(searchData) {
+  // запуск поиска при инпуте на поле поиска
+  onSearchInput(searchData, reset) {
+    if(searchData.length > 2) {
+      this.initSearch(searchData, reset);
+    }
+  }
+
+  initSearch(searchData, reset) {
+    const container = this._container.querySelector(`.films-list`);
     this._mainNavController.hide();
-    this._activeWindow.hide();
-    this._searchController.show(this._movieData, this._commentsData, searchData);
+    if(this._activeWindow != this._searchController) {
+      this._activeWindow.hide();
+    }
+    this._searchController.show(container, this._movieData, this._commentsData, searchData);
     this._activeWindow = this._searchController;
+    reset();
+  }
+
+  onSearchReset(searchData) {
+    if(searchData.length === 2) {
+     this.resetSearch();
+    }
+  }
+
+  resetSearch() {
+    this._mainNavController.show();
+    this._activeWindow.hide();
+    this._homePage.show(this._movieData, this._commentsData);
+    this._activeWindow = this._homePage;
   }
 
   onDataChange(typeData, movieId, data, movie) {
@@ -88,11 +114,10 @@ export default class MainPageController {
   }
 
   _onMainBtnClick(filterType) {
-    // this._activeWindow.hide();
     if(filterType === `stats`) {
       this._stats.show(this._movieData);
     } else {
-      this._homePage.show(this._movieData, filterType);
+      this._homePage.renderFilter(filterType);
     }
   };
 

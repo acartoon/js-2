@@ -4,6 +4,7 @@ import MovieBoard from "./movie-board";
 import BtnShowMore from "../components/btn-show-more";
 import MovieBoardMore from "./movie-board-more";
 import Sort from "../components/sort.js";
+import MovieList from "../components/movie-list";
 
 export default class HomePageController {
   constructor(container, onDataChangeMain) {
@@ -27,14 +28,19 @@ export default class HomePageController {
     this._renderSort(this._mainContainer);
     render(this._mainContainer, this._container.getElement(), Position.BEFOREEND);
 
-
-    this._mainBoard = new MovieBoardMore(BOARDS_LIST.ALL, this._mainBoardData, this._commentsData, this._container.getElement(), this.onDataChange);
+    const mainBoardContainer = new MovieList(BOARDS_LIST.ALL).getElement();
+    render(this._container.getElement(), mainBoardContainer)
+    this._mainBoard = new MovieBoardMore(this._mainBoardData, this._commentsData, mainBoardContainer, this.onDataChange);
     this._mainBoard.init();
 
-    this._topRated = new MovieBoard(BOARDS_LIST.TOP_RATED, this._getTopRatedMovie(this._movieData), this._commentsData, this._container.getElement(), this.onDataChange);
+    const topRatedContainer = new MovieList(BOARDS_LIST.TOP_RATED).getElement();
+    render(this._container.getElement(), topRatedContainer);
+    this._topRated = new MovieBoard(this._getTopRatedMovie(this._movieData), this._commentsData, topRatedContainer, this.onDataChange);
     this._topRated.init();
 
-    this._mostCommented = new MovieBoard(BOARDS_LIST.MOST_COMMENTED, this._getMostCommentedMovie(this._movieData), this._commentsData, this._container.getElement(), this.onDataChange);
+    const mostCommentedContainer = new MovieList(BOARDS_LIST.MOST_COMMENTED).getElement();
+    render(this._container.getElement(), mostCommentedContainer);
+    this._mostCommented = new MovieBoard(this._getMostCommentedMovie(this._movieData), this._commentsData, mostCommentedContainer, this.onDataChange);
     this._mostCommented.init();
   };
 
@@ -56,6 +62,7 @@ export default class HomePageController {
     this._mainBoard.render(movieData, flag);
   }
 
+  // сортировка
   _onSortBtnClick(sortType) {
     const movieDataToRender = {
       date: this._mainBoardData.slice().sort((a, b) => a.film_info.release.date - b.film_info.release.date),
@@ -107,11 +114,20 @@ export default class HomePageController {
     this._sort.hide();
     this._topRated.hide();
     this._mostCommented.hide();
+    this._mainBoard.reset();
   }
 
-  show(movieData, filterType) {
+  show(movieData, commentsData) {
+    this._sort.show();
+    this._topRated.show();
+    this._mostCommented.show();
     this._movieData = movieData;
-    this._mainBoardData = this._getMainBoardData(filterType);
-    this._rerendMainBoard(this._mainBoardData, filterFlag.reset)
+    this._commentsData = commentsData;
+    this._mainBoard.render(this._movieData, this._commentsData, filterFlag.reset);
+  }
+
+  renderFilter(filterType) {
+    const movieData = this._getMainBoardData(filterType);
+    this._mainBoard.render(movieData, this._commentsData, filterFlag.reset);
   }
 }

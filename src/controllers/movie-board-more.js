@@ -1,10 +1,10 @@
 import MovieBoard from "./movie-board";
 import BtnShowMore from "../components/btn-show-more";
-import { render, hideElement, filterFlag } from "../utils";
+import { render, hideElement, filterFlag, unrender } from "../utils";
 
 export default class MovieBoardMore extends MovieBoard {
-  constructor({isExtra, title}, movieData, commentsData, container, onDataChangeMain) {
-    super({isExtra, title}, movieData, commentsData, container, onDataChangeMain);
+  constructor(movieData, commentsData, container, onDataChangeMain) {
+    super(movieData, commentsData, container, onDataChangeMain);
     this._btn = new BtnShowMore();
     this._STEP_TO_RENDER = 5;
     this._countMovieToRender = this._STEP_TO_RENDER;
@@ -12,10 +12,8 @@ export default class MovieBoardMore extends MovieBoard {
   }
 
   init() {
-    this._renderContainer();
     this._countMovieToRender = this._STEP_TO_RENDER;
     const movieToRender = this._movieData.slice(0, this._countMovieToRender);
-    console.log(movieToRender)
     this._renderMovie(movieToRender);
 
     if(this._movieData.length > this._STEP_TO_RENDER) {
@@ -24,14 +22,19 @@ export default class MovieBoardMore extends MovieBoard {
   }
 
   _showBtn() {
-    const container = this._movieListContainer.getElement();
-    render(container, this._btn.getElement());
+    render(this._container, this._btn.getElement());
     this._btn.getElement().addEventListener('click', this._onClick);
   }
 
-  _hideBtn() {
+  hideBtn() {
     hideElement(this._btn.getElement());
     this._btn.getElement().removeEventListener('click', this._onClick);
+  }
+
+  reset() {
+    this._boardContainer.innerHTML = null;
+    unrender(this._btn.getElement());
+    this._btn.removeElement();
   }
 
   _onClick() {
@@ -40,7 +43,7 @@ export default class MovieBoardMore extends MovieBoard {
     this._renderMovie(movieToRender);
 
     if (this._movieData.length <= this._countMovieToRender) {
-      this._hideBtn();
+      this.hideBtn();
     }
   }
 
@@ -49,10 +52,10 @@ export default class MovieBoardMore extends MovieBoard {
     this._countMovieToRender = (flag === filterFlag.save) ? this._countMovieToRender : this._STEP_TO_RENDER;
 
     if (this._movieData.length >= this._countMovieToRender) {
-      this._btn.getElement().classList.remove(`visually-hidden`);
-      this._btn.getElement().addEventListener('click', this._onClick);
+      this._showBtn();
    }
-    this._movieListContainer.getElement().querySelector(`.films-list__container`).innerHTML = ``;
+
+   this._boardContainer.innerHTML = ``;
     const movieToRender = this._movieData.slice(0, this._countMovieToRender);
     this._renderMovie(movieToRender);
   }

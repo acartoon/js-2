@@ -1,6 +1,6 @@
 import NavigationContainer from "../components/navigation-container";
 import NavigationElement from "../components/navigation-element";
-import { render, Position, getCountFilms,  FILTER_TYPE, hideElement} from "../utils";
+import { render, Position, getCountFilms,  FILTER_TYPE, hideElement, showElement} from "../utils";
 export default class MainNavController {
   constructor(container, onClick) {
     this._container = container;

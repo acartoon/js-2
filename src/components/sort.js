@@ -1,5 +1,5 @@
 import AbstractComponent from './abstract-component.js';
-import { hideElement } from '../utils.js';
+import { hideElement, showElement } from '../utils.js';
 
 export default class Sort extends AbstractComponent {
   constructor(onClick) {

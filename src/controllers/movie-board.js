@@ -1,25 +1,19 @@
-import { render, Position, hideElement, getComments, RATING, DATA_CHANGE_COMMENTS, DATA_CHANGE_USER_DETAILS } from "../utils";
-import MovieList from "../components/movie-list";
+import { render, Position, hideElement, getComments, RATING, DATA_CHANGE_COMMENTS, DATA_CHANGE_USER_DETAILS, showElement } from "../utils";
 import MovieController from "./movie-controller";
 
 
 export default class MovieBoard {
-  constructor({isExtra, title}, movieData, commentsData, container, onDataChangeMain, position) {
+  constructor(movieData, commentsData, container, onDataChangeMain) {
     this._container = container;
+    this._boardContainer = this._container.querySelector(`.films-list__container`)
     this._movieData = movieData;
     this._commentsData = commentsData;
-    this._isExtra = isExtra;
-    this._title = title;
     this._onDataChangeMain = onDataChangeMain;
-    this._movieListContainer = new MovieList(this._isExtra, this._title);
     this.onDataChange = this.onDataChange.bind(this);
-    this._boardContainer = this._movieListContainer.getElement().querySelector('.films-list__container');
     this._subscriptions = [];
-    this._position = position;
   }
 
   init() {
-    this._renderContainer();
     this._renderMovie(this._movieData);
   }
 
@@ -28,11 +22,11 @@ export default class MovieBoard {
   }
 
   hide() {
-    hideElement(this._movieListContainer.getElement());
+    hideElement(this._container);
   }
 
-  _renderContainer() {
-    render(this._container, this._movieListContainer.getElement(), this._position);
+  show() {
+    showElement(this._container);
   }
 
   _renderMovie(movieData) {
@@ -85,5 +79,9 @@ export default class MovieBoard {
         movieCard.update(typeData, data);
       }
     });
+  }
+
+  clear() {
+    this._boardContainer.innerHTML = ``;
   }
 }

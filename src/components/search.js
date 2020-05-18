@@ -1,40 +1,34 @@
 import AbstractComponent from './abstract-component.js';
 
 export default class Search extends AbstractComponent {
-  constructor(searchInput, searchReset, btnResetClick) {
+  constructor(initSearch, resetSearch, MIN_LENGTH_VALUE) {
     super();
-    this._searchInput = searchInput;
-    this._searchReset = searchReset;
-    this._onBtnResetClick = btnResetClick;
-    this.reset = this.reset.bind(this);
+    this._initSearch = initSearch;
+    this._resetSearch = resetSearch;
+    this._MIN_LENGTH_VALUE = MIN_LENGTH_VALUE;
     this._input = this.getElement().querySelector(`.search__field`);
+    this._onSearchFieldInput = this._onSearchFieldInput.bind(this);
     this._init();
   }
 
   _init() {
-    //при трех и более инициализация поиска
-    this._input.addEventListener(`input`, (e) => this._onSearchInput(e));
-    //закрытие поиска при нажатии на кнопку
-    this.getElement().querySelector(`.search__reset`).addEventListener(`click`, this._onBtnResetClick);
-  };
-
-  _onSearchInput(e) {
-    const searchData = e.target.value;
-    console.log(searchData)
-    // при 2 и менее значения удаление поиска
-    this._searchInput(searchData, this.reset);
-  }
-
-  // добавление обработчика удаления поиска
-  reset() {
     this._input.addEventListener(`input`, (e) => {
-      this._searchReset(e.target.value);
+      const searchData = e.target.value;
+      if(searchData.length >= this._MIN_LENGTH_VALUE) {
+        this._initSearch(searchData);
+        this._input.addEventListener(`input`, this._onSearchFieldInput);
+      }
     });
+    //закрытие поиска при нажатии на кнопку
+    this.getElement().querySelector(`.search__reset`).addEventListener(`click`, this._resetSearch);
   };
 
-  _onReset(e) {
+
+  _onSearchFieldInput(e) {
     const searchData = e.target.value;
-    this._resetSearch(searchData);
+    if(searchData.length < this._MIN_LENGTH_VALUE) {
+      this._resetSearch();
+    }
   }
 
   getTemplate() {

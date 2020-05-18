@@ -21,16 +21,12 @@ export default class MainNavController {
     this._activeElement = activeBtn;
   }
 
-  _getData() {
-
-  }
-
   hide() {
-    hideElement(this._navContainer.getElement());
+    this._navContainer.hide();
   }
 
   show() {
-    showElement(this._navContainer.getElement());
+    this._navContainer.show();
   }
 
   init(movieData) {

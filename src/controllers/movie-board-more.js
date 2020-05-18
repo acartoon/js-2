@@ -1,6 +1,6 @@
 import MovieBoard from "./movie-board";
 import BtnShowMore from "../components/btn-show-more";
-import { render, hideElement, filterFlag, unrender } from "../utils";
+import { render, hideElement, filterFlag, unrender, showElement } from "../utils";
 
 export default class MovieBoardMore extends MovieBoard {
   constructor(movieData, commentsData, container, onDataChangeMain) {
@@ -17,14 +17,19 @@ export default class MovieBoardMore extends MovieBoard {
     this._renderMovie(movieToRender);
 
     if(this._movieData.length > this._STEP_TO_RENDER) {
-      this._showBtn();
+      this._renderBtn();
     }
   }
 
-  _showBtn() {
+  _renderBtn() {
     render(this._container, this._btn.getElement());
     this._btn.getElement().addEventListener('click', this._onClick);
   }
+
+  _showBtn() {
+    showElement(this._btn.getElement())
+    this._btn.getElement().addEventListener('click', this._onClick);
+}
 
   hideBtn() {
     hideElement(this._btn.getElement());
@@ -50,10 +55,12 @@ export default class MovieBoardMore extends MovieBoard {
   render(movieData, flag) {
     this._movieData = movieData;
     this._countMovieToRender = (flag === filterFlag.save) ? this._countMovieToRender : this._STEP_TO_RENDER;
-
-    if (this._movieData.length >= this._countMovieToRender) {
+    if (this._movieData.length > this._countMovieToRender) {
       this._showBtn();
-   }
+    }
+    else {
+      this.hideBtn();
+    }
 
    this._boardContainer.innerHTML = ``;
     const movieToRender = this._movieData.slice(0, this._countMovieToRender);

@@ -31,11 +31,11 @@ export default class Sort extends AbstractComponent {
 
   show() {
     showElement(this.getElement());
-    this._default()
+    this.default()
   }
 
 
-  _default() {
+  default() {
     const defaultActiveElem = this.getElement().querySelector(`[data-sort-type="default"]`);
     this._renderActiveElement(defaultActiveElem)
   }

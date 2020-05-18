@@ -3,7 +3,6 @@ import Search from "../components/search.js";
 import Profile from "../components/profile.js";
 import { render, DATA_CHANGE, DATA_CHANGE_TYPE, DATA_CHANGE_USER_DETAILS, DATA_CHANGE_COMMENTS } from "../utils.js";
 import MainNavController from "./main-nav-controller.js";
-import SearchController from "./search-controller.js";
 
 export default class MainPageController {
   constructor(container, movieData, commentsData) {
@@ -17,15 +16,13 @@ export default class MainPageController {
     this._homePage = new HomePageController(this._mainContainer, this.onDataChange.bind(this));
     this._activeWindow = null;
     this._filterBoard = null;
-    this._searchController = new SearchController(this._mainContainer, this.onDataChange.bind(this));
-    this.onSearchReset = this.onSearchReset.bind(this);
+    this.initSearch = this.initSearch.bind(this);
     this.resetSearch = this.resetSearch.bind(this);
-    this.onSearchInput = this.onSearchInput.bind(this);
-    this._search = new Search(this.onSearchInput, this.onSearchReset, this.resetSearch);
+    this._MIN_LENGTH_VALUE = 3;
+    this._search = new Search(this.initSearch, this.resetSearch, this._MIN_LENGTH_VALUE);
   }
 
   init() {
-    // запуск главной страницы
     const header = this._container.querySelector('.header');
     this._renderSearchForm(header);
     this._renderProfile(header);
@@ -35,41 +32,19 @@ export default class MainPageController {
     this.onDataChange = this.onDataChange.bind(this);
   }
 
-  // запуск поиска при инпуте на поле поиска
-  onSearchInput(searchData, reset) {
-    if(searchData.length > 2) {
-      this.initSearch(searchData, reset);
-    }
-  }
-
-  initSearch(searchData, reset) {
-    const container = this._container.querySelector(`.films-list`);
+  initSearch(searchData) {
+    this._homePage.initSearch(searchData);
     this._mainNavController.hide();
-    if(this._activeWindow != this._searchController) {
-      this._activeWindow.hide();
-    }
-    this._searchController.show(container, this._movieData, this._commentsData, searchData);
-    this._activeWindow = this._searchController;
-    reset();
-  }
-
-  onSearchReset(searchData) {
-    if(searchData.length === 2) {
-     this.resetSearch();
-    }
   }
 
   resetSearch() {
+    this._homePage.home();
     this._mainNavController.show();
-    this._activeWindow.hide();
-    this._homePage.show(this._movieData, this._commentsData);
-    this._activeWindow = this._homePage;
   }
 
   onDataChange(typeData, movieId, data, movie) {
     const index = this._movieData.findIndex((i) => i.id === movieId);
     let dataChange;
-
 
     switch (typeData) {
       case DATA_CHANGE.WATCHLIST:

@@ -1,62 +1,84 @@
 import MovieCard from "../components/movie-card";
-import { render, Position, DATA_CHANGE_USER_DETAILS, DATA_CHANGE_COMMENTS, RATING} from "../utils";
+import { render, Position, DATA_CHANGE_USER_DETAILS, DATA_CHANGE_COMMENTS, RATING, REMOVE_COMMENT, CREATE_COMMENT} from "../utils";
 import MovieDetailsController from "./movie-details-controller";
 
 export default class MovieController {
-  constructor(movieData, commentsData, container, onDataChangeMain, onChangeView) {
+  constructor(movieData, api, container, onDataChangeMain, onChangeView) {
     this._movieData = movieData;
-    this._commentsData = commentsData;
+    this._api = api;
     this._container = container;
     this._mainContainer = document.body;
     this._unrenderMovieDetails = this._unrenderMovieDetails.bind(this);
     this.onDataChangeMain = onDataChangeMain;
     this.onDataChange = this.onDataChange.bind(this);
     this._movie = new MovieCard(this._movieData, this.onDataChange);
-    // this._movieDetails = new MovieDetailsController(this._movieData, this._commentsData, this._unrenderMovieDetails, this.onDataChange);
-    this._renderMovieDetails = this._renderMovieDetails.bind(this);
+    this._onMovieClick = this._onMovieClick.bind(this);
   }
 
   init() {
     render(this._container, this._movie.getElement(), Position.BEFOREEND)
-    this._onMovieClick()
+    this._initMovieDetails();
   }
 
-  _onMovieClick() {
-    // this._movie.getElement().addEventListener(`click`, this._renderMovieDetails);
+  _initMovieDetails() {
     this._movie.getElement().querySelector(`.film-card__poster`)
-      .addEventListener(`click`, this._renderMovieDetails);
+      .addEventListener(`click`, this._onMovieClick);
   }
+
 
   onDataChange(typeData, data) {
     this.onDataChangeMain(typeData, this._movieData.id, data, this);
   }
 
-  _renderMovieDetails() {
-    console.log(this._commentsData)
-    this._movieDetails = new MovieDetailsController(this._movieData, this._commentsData, this._unrenderMovieDetails, this.onDataChange);
+  _onMovieClick() {
+    console.log(this._api.getComments)
+    this._api.getComments(this._movieData.id)
+      .then((data) => {
+        this._renderMovieDetails(data);
+      });
+  }
+
+  _renderMovieDetails(commentsData) {
+    this._movieDetails = new MovieDetailsController(this._movieData, commentsData, this._unrenderMovieDetails, this.onDataChange);
     this._movieDetails.init(this._mainContainer);
   }
 
-  _updateData(typeData, data) {
-    if(typeData === DATA_CHANGE_COMMENTS) {
-      this._movieData.comments = data.DATA_CHANGE_USER_DETAILS;
-      this._commentsData = data.DATA_CHANGE_COMMENTS;
+  _updateData(typeData, movieData, comments) {
+    if(typeData === REMOVE_COMMENT) {
+      this._movieData.comments = movieData;
+    } else if (typeData === CREATE_COMMENT) {
+      this._movieData.comments = movieData.comments;
     } else if (typeData === DATA_CHANGE_USER_DETAILS || typeData === RATING) {
-      this._movieData.user_details = data;
+      this._movieData.user_details = movieData;
     }
   }
 
-  update(typeData, data) {
-    this._updateData(typeData, data);
-    console.log(typeData)
+  update(typeData, movieData, comments) {
+    this._updateData(typeData, movieData, comments);
 
-    if(typeData === DATA_CHANGE_USER_DETAILS || typeData === RATING) {
+    if(typeData === DATA_CHANGE_USER_DETAILS) {
       this._movie.update(typeData, this._movieData.user_details);
-    } else if (typeData === DATA_CHANGE_COMMENTS) {
+    } else if (typeData === REMOVE_COMMENT || typeData === CREATE_COMMENT) {
       this._movie.update(typeData, this._movieData.comments);
     }
     if(this._movieDetails) {
-      this._movieDetails.update(typeData, data);
+      if(typeData === REMOVE_COMMENT) {
+        this._api.getComments(this._movieData.id)
+        .then((data) => {
+          const movieData = [];
+          movieData.movie = this._movieData;
+          movieData.comments = data;
+          this._movieDetails.update(typeData, movieData);
+        });
+        return;
+      } else if(typeData === CREATE_COMMENT) {
+        const movieData = [];
+        movieData.movie = this._movieData;
+        movieData.comments = comments;
+        this._movieDetails.update(typeData, movieData);
+      } else {
+        this._movieDetails.update(typeData, this._movieData.user_details);
+      }
     }
   }
 

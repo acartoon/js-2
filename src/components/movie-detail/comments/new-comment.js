@@ -8,12 +8,35 @@ export default class NewComment extends AbstractComponent {
     super();
     this._onTextareaInput = onTextareaInput;
     this._selectedEmotion = null;
+    this._onWindowOnline = this._onWindowOnline.bind(this);
+    this._onWindowOffline = this._onWindowOffline.bind(this);
+    this._inputComment = this.getElement().querySelector(`.film-details__comment-input`);
   }
 
   init(container) {
     this._container = container;
     this._render();
     render(this._container, this.getElement());
+
+   this._initListeners();
+  }
+
+  _initListeners() {
+    window.addEventListener('online',  this._onWindowOnline);
+    window.addEventListener('offline',  this._onWindowOffline);
+  }
+
+  removeListeners() {
+    window.addEventListener('online',  this._onWindowOnline);
+    window.addEventListener('offline',  this._onWindowOffline);
+  }
+
+  _onWindowOffline() {
+    this._inputComment.disabled = true;
+  }
+
+  _onWindowOnline() {
+    this._inputComment.disabled = false;
   }
 
   _render() {
@@ -34,8 +57,7 @@ export default class NewComment extends AbstractComponent {
   }
 
   _onInput() {
-    const input = this.getElement().querySelector(`.film-details__comment-input`);
-    input.addEventListener(`input`, (e) => {
+    this._inputComment.addEventListener(`input`, (e) => {
       this._onTextareaInput(e, this._selectedEmotion);
     });
   }

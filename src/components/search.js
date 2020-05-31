@@ -9,6 +9,7 @@ export default class Search extends AbstractComponent {
     this._input = this.getElement().querySelector(`.search__field`);
     this._onSearchFieldInput = this._onSearchFieldInput.bind(this);
     this._init();
+
   }
 
   _init() {
@@ -28,6 +29,7 @@ export default class Search extends AbstractComponent {
     const searchData = e.target.value;
     if(searchData.length < this._MIN_LENGTH_VALUE) {
       this._resetSearch();
+      this._input.removeEventListener(`input`, this._onSearchFieldInput);
     }
   }
 

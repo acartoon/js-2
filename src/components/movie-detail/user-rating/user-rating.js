@@ -32,7 +32,6 @@ export default class UserRating extends AbstractComponent{
 
   update(rating) {
     this._rating = rating;
-    console.log(this._rating)
     this._containerS.innerHTML = ``;
     this._renderRatingBtn();
   }

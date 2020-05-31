@@ -1,4 +1,4 @@
-import {render, KEY_CODE, unrender, USER_RATING_COUNT, DATA_CHANGE, DATA_CHANGE_USER_DETAILS, DATA_CHANGE_TYPE, DATA_CHANGE_COMMENTS, RATING} from '../utils.js';
+import {render, KEY_CODE, unrender, USER_RATING_COUNT, DATA_CHANGE, DATA_CHANGE_USER_DETAILS, DATA_CHANGE_TYPE, DATA_CHANGE_COMMENTS, RATING, REMOVE_COMMENT, CREATE_COMMENT} from '../utils.js';
 import moment from 'moment';
 import MovieDetails from '../components/movie-detail/movie-details.js';
 import BtnControls from '../components/movie-detail/btn-controls.js';
@@ -76,9 +76,12 @@ export default class MovieDetailsController{
   }
 
   _updateData(typeData, data) {
-    if(typeData === DATA_CHANGE_COMMENTS) {
-      this._movieData.comments = data.DATA_CHANGE_USER_DETAILS;
-      this._commentsData = data.DATA_CHANGE_COMMENTS;
+    console.log(typeData, data)
+    if(typeData === (REMOVE_COMMENT || CREATE_COMMENT)) {
+      this._movieData.comments = data.movie;
+      this._commentsData = data.comments;
+      console.log(data.comments)
+      console.log(this._commentsData)
     } else if (typeData === DATA_CHANGE_USER_DETAILS) {
       this._movieData.user_details = data;
     }
@@ -86,14 +89,18 @@ export default class MovieDetailsController{
 
   update(typeData, data) {
     this._updateData(typeData, data);
+    console.log(this._commentsData)
 
     switch (typeData) {
       case DATA_CHANGE_USER_DETAILS:
         this._btnControls.update(this._movieData.user_details.watchlist, this._movieData.user_details.already_watched, this._movieData.user_details.favorite)
         this._toggleUserRating();
         break;
-      case DATA_CHANGE_COMMENTS:
+      case REMOVE_COMMENT:
         this._comments.update(this._commentsData);
+        break;
+      case CREATE_COMMENT:
+        this._comments.update(data.comments);
         break;
       case RATING:
         if(this._userRating) {

@@ -51,4 +51,5 @@ export default class MainNavController {
       render(this._navContainer.getElement(), navElem.getElement(), Position.BEFOREEND);
     });
   }
+
 }

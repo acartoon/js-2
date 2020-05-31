@@ -52,7 +52,6 @@ export default class BtnControls extends AbstractComponent {
     } else if(value === DATA_CHANGE.FAVORITE) {
       data = !this._favorite
     }
-    console.log(value)
     this.onDataChangeMain(value, data);
   }
 

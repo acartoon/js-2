@@ -1,17 +1,19 @@
 import MovieContainer from "../components/movie-container";
-import { render, Position, BOARDS_LIST, hideElement, filterFlag, RATING, DATA_CHANGE_COMMENTS, DATA_CHANGE_USER_DETAILS} from "../utils";
+import { render, Position, BOARDS_LIST, hideElement, showElement, filterFlag, RATING, DATA_CHANGE_COMMENTS, DATA_CHANGE_USER_DETAILS, FILTER_TYPE, REMOVE_COMMENT, CREATE_COMMENT} from "../utils";
 import MovieBoard from "./movie-board";
 import BtnShowMore from "../components/btn-show-more";
 import MovieBoardMore from "./movie-board-more";
 import Sort from "../components/sort.js";
 import MovieList from "../components/movie-list";
-import ResultTitle from "../components/result-title";
+// import ResultTitle from "../components/result-title";
+import SearchController from "./search-controller";
 
 
 export default class HomePageController {
   constructor(container, onDataChangeMain) {
     this._mainContainer = container;
     this._container = new MovieContainer();
+    this._api = null;
     this._EXTRA_COUNT_MOVIE = 2;
     this._btnShowMore = new BtnShowMore();
     this._onSortBtnClick = this._onSortBtnClick.bind(this);
@@ -21,12 +23,13 @@ export default class HomePageController {
     this._onDataChangeMain = onDataChangeMain;
     this.onDataChange = this.onDataChange.bind(this);
     this._mainBoardContainer = null;
-    this._resultTitle = new ResultTitle(this._mainContainer);
+    // this._resultTitle = new ResultTitle(this._mainContainer);
+    this._searchController = null;
   }
 
-  init(movieData, commentsData) {
+  init(movieData, api) {
+    this._api = api;
     this._movieData = movieData;
-    this._commentsData = commentsData;
     this._mainBoardData = this._movieData;
 
     this._renderSort(this._mainContainer);
@@ -34,17 +37,17 @@ export default class HomePageController {
 
     this._mainBoardContainer = new MovieList(BOARDS_LIST.ALL).getElement();
     render(this._container.getElement(), this._mainBoardContainer)
-    this._mainBoard = new MovieBoardMore(this._mainBoardData, this._commentsData, this._mainBoardContainer, this.onDataChange);
+    this._mainBoard = new MovieBoardMore(this._mainBoardData, this._api, this._mainBoardContainer, this.onDataChange);
     this._mainBoard.init();
 
     const topRatedContainer = new MovieList(BOARDS_LIST.TOP_RATED).getElement();
     render(this._container.getElement(), topRatedContainer);
-    this._topRated = new MovieBoard(this._getTopRatedMovie(this._movieData), this._commentsData, topRatedContainer, this.onDataChange);
+    this._topRated = new MovieBoard(this._getTopRatedMovie(this._movieData), this._api, topRatedContainer, this.onDataChange);
     this._topRated.init();
 
     const mostCommentedContainer = new MovieList(BOARDS_LIST.MOST_COMMENTED).getElement();
     render(this._container.getElement(), mostCommentedContainer);
-    this._mostCommented = new MovieBoard(this._getMostCommentedMovie(this._movieData), this._commentsData, mostCommentedContainer, this.onDataChange);
+    this._mostCommented = new MovieBoard(this._getMostCommentedMovie(this._movieData), this._api, mostCommentedContainer, this.onDataChange);
     this._mostCommented.init();
   };
 
@@ -82,25 +85,33 @@ export default class HomePageController {
 
   _updateData(typeData, movieId, data) {
     const index = this._movieData.findIndex((i) => i.id === movieId);
-    if(typeData === DATA_CHANGE_COMMENTS) {
-      this._movieData[index].comments = data[DATA_CHANGE_USER_DETAILS];
-      this._commentsData = data[DATA_CHANGE_COMMENTS];
-
+    if(typeData === REMOVE_COMMENT) {
+      this._movieData[index].comments = data;
+    } else if(typeData === CREATE_COMMENT) {
+      this._movieData[index].comments = data.comments;
     } else if(typeData === DATA_CHANGE_USER_DETAILS || typeData === RATING) {
       this._movieData[index].user_details = data;
     }
   }
 
-  update(typeData, movie, movieId, data) {
+  update(typeData, movieId, data, comments = false) {
     this._updateData(typeData, movieId, data);
-    this._mainBoard.updateMovie(typeData, movie, movieId, data);
-    this._topRated.updateMovie(typeData, movie, movieId, data);
-    this._mostCommented.updateMovie(typeData, movie, movieId, data);
-    if(typeData === DATA_CHANGE_COMMENTS) {
-      this._mostCommented.updateBoard(this._getMostCommentedMovie(this._movieData), this._commentsData);
+    this._mainBoard.updateMovie(typeData, movieId, data, comments);
+    this._topRated.updateMovie(typeData, movieId, data, comments);
+    this._mostCommented.updateMovie(typeData, movieId, data, comments);
+
+    switch(typeData) {
+      case REMOVE_COMMENT:
+        this._mostCommented.updateBoard(this._getMostCommentedMovie(this._movieData));
+      case CREATE_COMMENT:
+        this._mostCommented.updateBoard(this._getMostCommentedMovie(this._movieData));
+      case RATING:
+        this._mostCommented.updateBoard(this._getMostCommentedMovie(this._movieData));
     }
-    if(typeData === RATING) {
-      this._topRated.updateBoard(this._getMostCommentedMovie(this._movieData), this._commentsData);
+
+    if (this._filterType !== FILTER_TYPE.ALL.anchor) {
+      const movieData = this._getMainBoardData(this._filterType);
+      this._mainBoard.render(movieData, filterFlag.save);
     }
   }
 
@@ -117,23 +128,14 @@ export default class HomePageController {
   }
 
   initSearch(searchData) {
-    this._searchData = searchData;
     this._hide();
-    const resultData = this._movieData.filter((movie) => {
-      return movie.film_info.title.toLowerCase().includes(this._searchData.toLowerCase());
-    });
-
-    if(resultData.length !== 0) {
-      this._resultTitle.init(resultData.length);
-      this._movieBoard = new MovieBoard(resultData, this._commentsData, this._mainBoardContainer, this.onDataChangeMain);
-      this._movieBoard.init();
-    } else {
-
-    }
+    this._searchController = new SearchController(this._mainContainer, this._mainBoardContainer);
+    this._searchController.init(searchData, this._movieData, this._api);
   }
 
   home() {
-    this._resultTitle.hide();
+    showElement(this._container.getElement())
+    this._searchController = null;
     this._sort.show();
     this._topRated.show();
     this._mostCommented.show();
@@ -147,7 +149,13 @@ export default class HomePageController {
     this._mainBoard.reset();
   }
 
+  hide() {
+    hideElement(this._container.getElement())
+    this._sort.hide();
+  }
+
   renderFilter(filterType) {
+    this._filterType = filterType;
     this._sort.default();
     const movieData = this._getMainBoardData(filterType);
     this._mainBoard.render(movieData, this._commentsData, filterFlag.reset);

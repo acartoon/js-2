@@ -1,9 +1,40 @@
 import moment from "moment";
 
 export const DATA_CHANGE_COMMENTS = `comments`;
+export const CREATE_COMMENT = `create`;
+export const REMOVE_COMMENT = `remove`;
 export const DATA_CHANGE_USER_DETAILS = `user_details`;
 export const RATING = `RATING`;
 export const USER_RATING_COUNT = 9;
+
+// export const TYPE_CHANGE_DATA = {
+//   CREATE_COMMENT: `create`,
+//   REMOVE_COMMENT: `remove`,
+//   UPDATE_MOVIE: `remove`,
+// }
+
+export const Method = {
+  GET: `GET`,
+  POST: `POST`,
+  PUT: `PUT`,
+  DELETE: `DELETE`
+};
+
+
+
+export const STATS_PARAMS = {
+  CHART_TYPE: `horizontalBar`,
+  MIN_X_LIMIT: 0,
+  LABEL_FONT_SIZE: 20,
+  LABEL_COLOR: `#FFF`,
+  LABEL_PADDING: 100,
+  LABEL_OFFSET: 50,
+  LABEL_ALIGNT: `left`,
+  LABEL_ANCHOR: `start`,
+  GENRE_COLOR: `#FBE44D`,
+  BAR_HEIGHT: 50,
+}
+
 
 export const KEY_CODE = {
   ESC: `Escape`,
@@ -16,13 +47,21 @@ export const Position = {
   BEFOREEND: `beforeend`,
 };
 
+export const render = (container, element, place = `beforeend`) => {
+  const places = {
+    'afterbegin': container.prepend(element),
+    'beforeend': container.append(element),
+  };
+  return places[place];
+};
+
 export const DATA_CHANGE_TYPE = {
   RATING: RATING,
   WATCHLIST: DATA_CHANGE_USER_DETAILS,
   FAVORITE: DATA_CHANGE_USER_DETAILS,
   ALREADY_WATCHED: DATA_CHANGE_USER_DETAILS,
-  CREATE_COMMENT: DATA_CHANGE_COMMENTS,
-  REMOVE_COMMENT: DATA_CHANGE_COMMENTS,
+  CREATE_COMMENT: CREATE_COMMENT,
+  REMOVE_COMMENT: REMOVE_COMMENT,
 }
 
 export const DATA_CHANGE = {
@@ -154,13 +193,6 @@ export const createElement = (template) => {
   return newElement.lastChild;
 };
 
-export const render = (container, element, place = `beforeend`) => {
-  const places = {
-    'afterbegin': container.prepend(element),
-    'beforeend': container.append(element),
-  };
-  return places[place];
-};
 
 export const unrender = (element) => {
   if (element) {
@@ -200,3 +232,16 @@ export const hideElement = (element) => {
 export const showElement = (element) => {
   element.classList.remove(`visually-hidden`)
 }
+
+
+export const checkStatus = (response) => {
+  if (response.status >= 200 && response.status < 300) {
+    return response;
+  } else {
+    throw new Error(`${response.status}: ${response.statusText}`);
+  }
+};
+
+export const toJSON = (response) => {
+  return response.json();
+};

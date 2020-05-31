@@ -16,7 +16,6 @@ export default class RatingLabel extends AbstractComponent{
 
   _onClick(evt) {
     this._onDataChange(DATA_CHANGE.RATING, this._value)
-    console.log(evt.target)
   }
 
   getTemplate() {

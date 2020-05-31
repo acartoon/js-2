@@ -11,7 +11,8 @@ export default class CommentsController{
     this._commentsList = new CommentsList();
     this._onDocumentKeyDown = this._onDocumentKeyDown.bind(this);
     this._newComment = new NewComment(this.onTextareaInput.bind(this));
-    this.onDataChange = onDataChange;
+    this._onDataChangeMain = onDataChange;
+    this.onDataChange = this.onDataChange.bind(this);
     this._selectedEmotion = null;
     // this.onTextareaInput = this.onTextareaInput;
   }
@@ -25,16 +26,20 @@ export default class CommentsController{
     this._renderNewComments();
   }
 
+  onDataChange(dataType, comment) {
+    this._activeComment = comment;
+    this._onDataChangeMain(dataType, this._activeComment.id)
+  }
+
   _onDocumentKeyDown(e) {
     if(e.key === KEY_CODE.ENTER && (e.ctrlKey || e.metaKey)) {
       const comment = e.target.value;
       const message = this._createNewMessage(this._selectedEmotion, comment);
-      this.onDataChange(DATA_CHANGE.CREATE_COMMENT, message);
+      this._onDataChangeMain(DATA_CHANGE.CREATE_COMMENT, message);
     }
   }
 
   onTextareaInput(e, selectedEmotion) {
-    console.log(selectedEmotion)
     this._selectedEmotion = selectedEmotion;
     document.addEventListener(`keydown`, this._onDocumentKeyDown)
   }
@@ -42,22 +47,20 @@ export default class CommentsController{
   update(data) {
     this._commentsData = data;
     this._commentsList.getElement().innerHTML = ``;
-    console.log(this._commentsData)
     this._renderComments();
     this._movieCommentsContainer.update(this._commentsData.length);
   }
 
   _createNewMessage(emotion, comment) {
     return {
-      id: getRandomString(3),
       comment,
-      author: `secret`,
       date: new Date(),
       emotion: emotion ? emotion : EMOJIS.SMILE,
     }
   }
 
   unrender() {
+    this._newComment.removeListeners();
     unrender(this._movieCommentsContainer.getElement());
     this._movieCommentsContainer.removeElement();
     unrender(this._commentsList.getElement());

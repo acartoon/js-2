@@ -3,8 +3,8 @@ import BtnShowMore from "../components/btn-show-more";
 import { render, hideElement, filterFlag, unrender, showElement } from "../utils";
 
 export default class MovieBoardMore extends MovieBoard {
-  constructor(movieData, commentsData, container, onDataChangeMain) {
-    super(movieData, commentsData, container, onDataChangeMain);
+  constructor(movieData, api, container, onDataChangeMain) {
+    super(movieData, api, container, onDataChangeMain);
     this._btn = new BtnShowMore();
     this._STEP_TO_RENDER = 5;
     this._countMovieToRender = this._STEP_TO_RENDER;
@@ -38,8 +38,7 @@ export default class MovieBoardMore extends MovieBoard {
 
   reset() {
     this._boardContainer.innerHTML = null;
-    unrender(this._btn.getElement());
-    this._btn.removeElement();
+    this.hideBtn();
   }
 
   _onClick() {

@@ -1,46 +1,78 @@
-import { render, Position, hideElement, getComments } from "../utils";
-import MovieList from "../components/movie-list";
-import MovieCard from "../components/movie-card";
+import { render, Position, hideElement, getComments, RATING, DATA_CHANGE_COMMENTS, DATA_CHANGE_USER_DETAILS, showElement, REMOVE_COMMENT, CREATE_COMMENT } from "../utils";
 import MovieController from "./movie-controller";
 
 
 export default class MovieBoard {
-  constructor({isExtra, title}, movieData, commentsData, container) {
+  constructor(movieData, api, container, onDataChangeMain) {
     this._container = container;
+    this._boardContainer = this._container.querySelector(`.films-list__container`)
     this._movieData = movieData;
-    this._commentsData = commentsData;
-    this._isExtra = isExtra;
-    this._title = title;
-    this._movieListContainer = new MovieList(this._isExtra, this._title);
+    this._api = api;
+    this._onDataChangeMain = onDataChangeMain;
+    this.onDataChange = this.onDataChange.bind(this);
+    this._subscriptions = [];
   }
 
   init() {
-    this._renderContainer();
     this._renderMovie(this._movieData);
   }
 
-  _renderContainer() {
-    render(this._container, this._movieListContainer.getElement(), Position.BEFOREEND);
+  //тоже вопрос, подвтор данных movieId и movie??????
+  //врятли нужна деструктуризация
+  // onDataChange(typeData, movieId, data, movie) {
+  onDataChange(data) {
+    this._onDataChangeMain(data);
+  }
+
+  hide() {
+    hideElement(this._container);
+  }
+
+  show() {
+    showElement(this._container);
   }
 
   _renderMovie(movieData) {
     movieData.forEach((movie) => {
-      const container = this._movieListContainer.getElement().querySelector('.films-list__container');
-     const comments = getComments(movie.comments, this._commentsData);
-     console.log(movie.comments)
-     console.log(comments)
-      const movieCard = new MovieController(movie, comments, container);
+      const movieCard = new MovieController(movie, this._api, this._boardContainer, this.onDataChange);
+      this._subscriptions.push(movieCard);
       movieCard.init();
     });
   }
 
-  update(movieData) {
-    this._movieListContainer.getElement().querySelector('.films-list__container').innerHTML = ``;
-    this._movieData = movieData;
-    this._renderMovie();
+  _updateData({typeDataChange, movieId, value}) {
+    const index = this._movieData.findIndex((i) => i.id === movieId);
+    if(index === -1) {
+      return;
+    }
+    if(typeDataChange === REMOVE_COMMENT || typeDataChange === CREATE_COMMENT) {
+      this._movieData[index].comments = value.movie;
+    } else if(typeDataChange === DATA_CHANGE_USER_DETAILS || typeDataChange === RATING) {
+      this._movieData[index].user_details = value;
+    }
   }
 
-  // hide() {
-  //   hideElement(this._movieListContainer.getElement());
-  // }
+  updateMovie(data) {
+    this._updateData(data)
+    this._updateMovie(data);
+  }
+
+  updateBoard(movieData, commentsData) {
+    this._movieData = movieData;
+    this._commentsData = commentsData;
+    this._boardContainer.innerHTML = ``;
+    this._renderMovie(this._movieData);
+  }
+
+  _updateMovie({typeDataChange, movieId, value}) {
+    this._subscriptions.forEach((movieCard) => {
+      if(movieCard._movieData.id === movieId) {
+        movieCard.update({typeDataChange, value});
+      }
+    });
+  }
+
+  clear() {
+    this._boardContainer.innerHTML = ``;
+  }
 }

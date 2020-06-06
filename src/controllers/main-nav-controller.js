@@ -1,6 +1,6 @@
 import NavigationContainer from "../components/navigation-container";
 import NavigationElement from "../components/navigation-element";
-import { render, Position, getCountFilms,  FILTER_TYPE} from "../utils";
+import { render, Position, getCountFilms,  FILTER_TYPE, hideElement, showElement} from "../utils";
 export default class MainNavController {
   constructor(container, onClick) {
     this._container = container;
@@ -21,8 +21,12 @@ export default class MainNavController {
     this._activeElement = activeBtn;
   }
 
-  _getData() {
+  hide() {
+    this._navContainer.hide();
+  }
 
+  show() {
+    this._navContainer.show();
   }
 
   init(movieData) {
@@ -47,4 +51,5 @@ export default class MainNavController {
       render(this._navContainer.getElement(), navElem.getElement(), Position.BEFOREEND);
     });
   }
+
 }

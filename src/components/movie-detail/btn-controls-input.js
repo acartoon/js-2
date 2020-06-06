@@ -1,10 +1,10 @@
 import AbstractComponent from '../abstract-component.js';
 
 export default class BtnControlsInput extends AbstractComponent {
-  constructor({data, name}) {
+  constructor(data, name) {
     super();
-    this._name = name;
     this._data = data;
+    this._name = name;
   }
 
   getTemplate() {

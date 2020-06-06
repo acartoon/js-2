@@ -1,15 +1,13 @@
-// import MovieBaseComponent from './movie-base-component.js';
-// import MovieBtnState from './movie-btn-state.js';
-import {render, unrender, BTN_CARD_CONTROLS} from '../utils.js';
+import {render, unrender, BTN_CARD_CONTROLS, DATA_CHANGE_USER_DETAILS, DATA_CHANGE_COMMENTS, REMOVE_COMMENT, CREATE_COMMENT} from '../utils.js';
 import moment from 'moment';
+import 'moment-duration-format';
 import MovieBaseComponent from './movie-base-component.js';
 import MovieBtnControls from './movie-btn-controls.js';
-// import MovieCommentsCount from './movie-comments-count';
 
 export default class MovieCard extends MovieBaseComponent {
   constructor(data, onDataChange) {
     super(data);
-    this._onDataChange = onDataChange;
+    this.onDataChange = onDataChange;
     this._movieCommentsCount = null;
 
     this._init();
@@ -17,30 +15,39 @@ export default class MovieCard extends MovieBaseComponent {
 
   _init() {
     this._renderBtnControls(this._user_details);
-    // this.renderCommentsCount(this._comments.length);
   }
 
-  renderCommentsCount(commentsCount) {
-    this._movieCommentsCount = new MovieCommentsCount(commentsCount);
-    this.getElement().querySelector(`.film-card__controls`).before(this._movieCommentsCount.getElement());
-  }
 
-  updateData(typeDataChange, dataToChange) {
-
-    if (typeDataChange === `userState`) {
-      this.getElement().querySelector(`.film-card__controls`).innerHTML = ``;
-      this._renderBtnState(dataToChange.user_details);
-    } else if (typeDataChange === `comment`) {
-      unrender(this._movieCommentsCount.getElement());
-      this._movieCommentsCount.removeElement();
-      this.renderCommentsCount(dataToChange.comments.length);
+  _updateData({typeDataChange, value}) {
+    if(typeDataChange === DATA_CHANGE_USER_DETAILS) {
+      this._user_details = value
+    } else if(typeDataChange === REMOVE_COMMENT || typeDataChange === CREATE_COMMENT) {
+      this._comments = value;
     }
   }
 
-  _renderBtnControls(user_details) {
+  update({typeDataChange, value}) {
+    this._updateData({typeDataChange, value});
+    if(typeDataChange === DATA_CHANGE_USER_DETAILS) {
+      this._updateBtnControls();
+    } else if(typeDataChange === REMOVE_COMMENT || typeDataChange === CREATE_COMMENT) {
+      this._updateCommentsCount(this._comments.length)
+    }
+  }
+
+  _updateBtnControls() {
+    this.getElement().querySelector(`.film-card__controls`).innerHTML = ``;
+    this._renderBtnControls();
+  }
+
+  _updateCommentsCount(count) {
+    this.getElement().querySelector(`.film-card__comments`).innerHTML = `${count} comments`;
+  }
+
+  _renderBtnControls() {
     const btnContainer = this.getElement().querySelector(`.film-card__controls`);
     Object.keys(BTN_CARD_CONTROLS).forEach((key) => {
-      const btn = new MovieBtnControls(BTN_CARD_CONTROLS[key], user_details[key], this._onDataChange);
+      const btn = new MovieBtnControls(BTN_CARD_CONTROLS[key], this._user_details[key], this.onDataChange);
       render(btnContainer, btn.getElement());
     });
   }
@@ -51,11 +58,12 @@ export default class MovieCard extends MovieBaseComponent {
     <p class="film-card__rating">${this._total_rating}</p>
     <p class="film-card__info">
       <span class="film-card__year">${moment(this._releaseDate).format(`YYYY`)}</span>
-      <span class="film-card__duration">${this._runtime}</span>
+      <span class="film-card__duration">${moment.duration(this._runtime, `minutes`).format(`h[h] mm[m]`)}</span>
       <span class="film-card__genre">${Array.from(this._genre)[0]}</span>
     </p>
     <img src="${this._poster}" alt="" class="film-card__poster">
     <p class="film-card__description">${this._description.length < 140 ? this._description : `${this._description.slice(0, 139).trim()}…`}</p>
+    <a class="film-card__comments">${this._comments.length} comments</a>
     <form class="film-card__controls"></form>
     </article>`;
   }

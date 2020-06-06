@@ -1,14 +1,13 @@
 import AbstractComponent from './abstract-component.js';
 
 export default class MovieBtnControls extends AbstractComponent {
-  constructor({state, classBtn, title}, data, onDataChange) {
+  constructor({classBtn, title, dataType}, data, onDataChange) {
     super();
-    this._state = state;
     this._classBtn = classBtn;
     this._data = data;
     this._title = title;
     this._onDataChange = onDataChange;
-
+    this._dataType = dataType;
     this._onClick();
   }
 
@@ -20,7 +19,7 @@ export default class MovieBtnControls extends AbstractComponent {
   _onClick() {
     this.getElement().addEventListener(`click`, (evt) => {
       evt.preventDefault();
-      this._onDataChange(`userState`, this._state);
+      this._onDataChange({typeDataChange: this._dataType, value: !this._data});
     });
   }
 }

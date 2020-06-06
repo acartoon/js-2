@@ -4,35 +4,10 @@ import AbstractComponent from '../abstract-component.js';
 import MovieBaseComponent from '../movie-base-component.js';
 
 export default class MovieDetails extends MovieBaseComponent{
-  constructor(data, commentsData, onClosePopup) {
+  constructor(data) {
     super(data);
-    this._commentsData = commentsData;
-    this._onClosePopup = onClosePopup;
-    this._closeBtn = null;
-    this._onCloseBtnClick = this._onCloseBtnClick.bind(this);
-    this._onEscKeyDown = this._onEscKeyDown.bind(this);
   }
 
-  init(container) {
-    this._container = container;
-    render(this._container, this.getElement())
-    this._closeBtn = this.getElement().querySelector(`.film-details__close-btn`);
-    this._closeBtn.addEventListener(`click`, this._onCloseBtnClick);
-    document.addEventListener(`keydown`, this._onEscKeyDown);
-  }
-
-  _onCloseBtnClick() {
-    this._onClosePopup();
-    this._closeBtn.removeEventListener(`click`, this._onClose);
-    document.removeEventListener(`keydown`, this._onEscKeyDown);
-
-  }
-
-  _onEscKeyDown(evt) {
-    if(evt.key === KEY_CODE.ESC) {
-      this._onCloseBtnClick();
-    }
-  }
 
   getTemplate() {
     return `<section class="film-details">
@@ -98,9 +73,9 @@ export default class MovieDetails extends MovieBaseComponent{
             </div>
           </div>
         </div>
-
+        <div class="form-details__middle-container">
+        </div>
         <div class="form-details__bottom-container">
-
     </div>
   </form>
   </section>`;

@@ -1,6 +1,37 @@
 import AbstractComponent from './abstract-component.js';
 
 export default class Search extends AbstractComponent {
+  constructor(initSearch, resetSearch, MIN_LENGTH_VALUE) {
+    super();
+    this._initSearch = initSearch;
+    this._resetSearch = resetSearch;
+    this._MIN_LENGTH_VALUE = MIN_LENGTH_VALUE;
+    this._input = this.getElement().querySelector(`.search__field`);
+    this._onSearchFieldInput = this._onSearchFieldInput.bind(this);
+    this._init();
+
+  }
+
+  _init() {
+    this._input.addEventListener(`input`, (e) => {
+      const searchData = e.target.value;
+      if(searchData.length >= this._MIN_LENGTH_VALUE) {
+        this._initSearch(searchData);
+        this._input.addEventListener(`input`, this._onSearchFieldInput);
+      }
+    });
+    //закрытие поиска при нажатии на кнопку
+    this.getElement().querySelector(`.search__reset`).addEventListener(`click`, this._resetSearch);
+  };
+
+
+  _onSearchFieldInput(e) {
+    const searchData = e.target.value;
+    if(searchData.length < this._MIN_LENGTH_VALUE) {
+      this._resetSearch();
+      this._input.removeEventListener(`input`, this._onSearchFieldInput);
+    }
+  }
 
   getTemplate() {
     return `<form class="header__search search">

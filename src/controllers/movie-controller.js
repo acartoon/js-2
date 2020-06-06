@@ -1,35 +1,72 @@
 import MovieCard from "../components/movie-card";
-import { render, Position, unrender } from "../utils";
-import MovieDetails from "../components/movie-detail/movie-details";
+import { render, Position, DATA_CHANGE_USER_DETAILS, DATA_CHANGE_COMMENTS, RATING, REMOVE_COMMENT, CREATE_COMMENT} from "../utils";
+import MovieDetailsController from "./movie-details-controller";
 
 export default class MovieController {
-  constructor(movieData, commentsData, container, onDataChange, onChangeView) {
+  constructor(movieData, api, container, onDataChangeMain, onChangeView) {
     this._movieData = movieData;
-    this._commentsData = commentsData;
+    this._api = api;
     this._container = container;
     this._mainContainer = document.body;
-    this._movie = new MovieCard(this._movieData);
     this._unrenderMovieDetails = this._unrenderMovieDetails.bind(this);
-    this._movieDetails = new MovieDetails(this._movieData, this._commentsData, this._unrenderMovieDetails);
-    this._renderMovieDetails = this._renderMovieDetails.bind(this);
+    this.onDataChangeMain = onDataChangeMain;
+    this.onDataChange = this.onDataChange.bind(this);
+    this._movie = new MovieCard(this._movieData, this.onDataChange);
+    this._onMovieClick = this._onMovieClick.bind(this);
   }
 
   init() {
     render(this._container, this._movie.getElement(), Position.BEFOREEND)
-    this._onMovieClick()
+    this._initMovieDetails();
+  }
+
+  _initMovieDetails() {
+    this._movie.getElement().querySelector(`.film-card__poster`)
+      .addEventListener(`click`, this._onMovieClick);
+  }
+
+
+  onDataChange({typeDataChange, value}) {
+    this.onDataChangeMain({typeDataChange: typeDataChange, movieId: this._movieData.id, value: value});
   }
 
   _onMovieClick() {
-    this._movie.getElement().addEventListener(`click`, this._renderMovieDetails)
+    this._api.getComments(this._movieData.id)
+      .then((data) => {
+        this._renderMovieDetails(data);
+      });
   }
 
-  _renderMovieDetails() {
-    this._movieDetails.init(this._mainContainer)
+  _renderMovieDetails(commentsData) {
+    this._movieDetails = new MovieDetailsController(this._movieData, commentsData, this._unrenderMovieDetails, this.onDataChange);
+    this._movieDetails.init(this._mainContainer);
+  }
+
+  _updateData({typeDataChange, value}) {
+    if(typeDataChange === REMOVE_COMMENT) {
+      this._movieData.comments = value;
+    } else if (typeDataChange === CREATE_COMMENT) {
+      this._movieData.comments = value.comments;
+    } else if (typeDataChange === DATA_CHANGE_USER_DETAILS || typeData === RATING) {
+      this._movieData.user_details = value;
+    }
+  }
+
+  update({typeDataChange, value}) {
+    console.log(typeDataChange, value)
+    this._updateData({typeDataChange, value});
+
+    if(typeDataChange !== RATING) {
+      this._movie.update({typeDataChange, value});
+    }
+    if(this._movieDetails) {
+      this._movieDetails.update({typeDataChange, value});
+    }
   }
 
   _unrenderMovieDetails() {
     document.body.classList.remove(`hide-overflow`);
-    unrender(this._movieDetails.getElement());
-    this._movieDetails.removeElement();
+    this._movieDetails.unrender();
+    this._movieDetails = null;
   }
 }

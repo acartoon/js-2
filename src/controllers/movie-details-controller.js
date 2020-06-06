@@ -1,31 +1,60 @@
-import {render, KEY_CODE} from '../../utils.js';
+import {render, KEY_CODE, unrender, USER_RATING_COUNT, DATA_CHANGE, DATA_CHANGE_USER_DETAILS, DATA_CHANGE_TYPE, DATA_CHANGE_COMMENTS, RATING, REMOVE_COMMENT, CREATE_COMMENT} from '../utils.js';
 import moment from 'moment';
-import AbstractComponent from '../abstract-component.js';
-import MovieBaseComponent from '../movie-base-component.js';
+import MovieDetails from '../components/movie-detail/movie-details.js';
+import BtnControls from '../components/movie-detail/btn-controls.js';
+import CommentsController from './comments-controller.js';
+import UserRating from '../components/movie-detail/user-rating/user-rating.js';
 
-export default class MovieDetails extends MovieBaseComponent{
-  constructor(data, commentsData, onClosePopup) {
-    super(data);
+export default class MovieDetailsController{
+  constructor(movieData, commentsData, onClosePopup, onDataChange) {
+    this._movieData = movieData;
     this._commentsData = commentsData;
     this._onClosePopup = onClosePopup;
-    this._closeBtn = null;
     this._onCloseBtnClick = this._onCloseBtnClick.bind(this);
     this._onEscKeyDown = this._onEscKeyDown.bind(this);
+    this._movie = new MovieDetails(this._movieData);
+    this.onDataChange = onDataChange.bind(this);
+    this._comments = new CommentsController(this._commentsData, this.onDataChange);
+    this._closeBtn = this._movie.getElement().querySelector(`.film-details__close-btn`);
+    this._containerRating = this._movie.getElement().querySelector(`.form-details__middle-container`);
+    this._btnControls = null;
+    this._userRating = null;
+    this._btnControls = null;
   }
 
   init(container) {
     this._container = container;
-    render(this._container, this.getElement())
-    this._closeBtn = this.getElement().querySelector(`.film-details__close-btn`);
-    this._closeBtn.addEventListener(`click`, this._onCloseBtnClick);
-    document.addEventListener(`keydown`, this._onEscKeyDown);
+    render(this._container, this._movie.getElement());
+
+    this._renderBtnControls();
+    this._toggleUserRating();
+    this._renderComments();
+    this._initListeners();
   }
 
-  _onCloseBtnClick() {
-    this._onClosePopup();
-    this._closeBtn.removeEventListener(`click`, this._onClose);
-    document.removeEventListener(`keydown`, this._onEscKeyDown);
+  _renderUserRating() {
+    this._userRating = new UserRating(this._movieData.user_details.personal_rating, this.onDataChange);
+    this._userRating.init(this._containerRating);
+  }
 
+  _unrenderUserRating() {
+    this._remove(this._userRating);
+    this._userRating = null;
+  }
+
+  _toggleUserRating() {
+    const alreadyWatched = this._movieData.user_details.already_watched;
+
+    if(alreadyWatched && !this._userRating) {
+      this._renderUserRating();
+    } else if(!alreadyWatched && this._userRating) {
+      this._unrenderUserRating();
+    }
+  }
+
+  _initListeners() {
+    this._closeBtn.addEventListener(`click`, this._onCloseBtnClick);
+    document.addEventListener(`keydown`, this._onEscKeyDown);
   }
 
   _onEscKeyDown(evt) {
@@ -34,75 +63,68 @@ export default class MovieDetails extends MovieBaseComponent{
     }
   }
 
-  getTemplate() {
-    return `<section class="film-details">
-    <form class="film-details__inner" action="" method="get">
-        <div class="form-details__top-container">
-          <div class="film-details__close">
-            <button class="film-details__close-btn" type="button">close</button>
-          </div>
-          <div class="film-details__info-wrap">
-            <div class="film-details__poster">
-              <img class="film-details__poster-img" src="${this._poster}" alt="${this._poster}">
+  _onCloseBtnClick() {
+    this._onClosePopup();
+    this._closeBtn.removeEventListener(`click`, this._onClose);
+    document.removeEventListener(`keydown`, this._onEscKeyDown);
+  }
 
-              <p class="film-details__age">${this._age_rating}</p>
-            </div>
+  _renderBtnControls() {
+    this._btnControls = new BtnControls(this._movieData.user_details, this.onDataChange);
+    const container = this._movie.getElement().querySelector(`.form-details__top-container`);
+    this._btnControls.init(container);
+  }
 
-            <div class="film-details__info">
-              <div class="film-details__info-head">
-                <div class="film-details__title-wrap">
-                  <h3 class="film-details__title">${this._title}</h3>
-                  <p class="film-details__title-original">Original: ${this._alternative_title}</p>
-                </div>
+  _updateData({typeDataChange, value}) {
+    console.log(value)
+    if(typeDataChange === (REMOVE_COMMENT || CREATE_COMMENT)) {
+      this._movieData.comments = value.movie;
+      console.log(this._movieData)
+      this._commentsData = value.comments;
+    } else if (typeDataChange === DATA_CHANGE_USER_DETAILS) {
+      this._movieData.user_details = value;
+    }
+  }
 
-                <div class="film-details__rating">
-                  <p class="film-details__total-rating">${this._total_rating}</p>
-                </div>
-              </div>
+  update({typeDataChange, value}) {
+    console.log(value)
+    this._updateData({typeDataChange, value});
+    switch (typeDataChange) {
+      case DATA_CHANGE_USER_DETAILS:
+        this._btnControls.update(this._movieData.user_details.watchlist, this._movieData.user_details.already_watched, this._movieData.user_details.favorite)
+        this._toggleUserRating();
+        break;
+      case REMOVE_COMMENT:
+        this._comments.update({typeDataChange, value: this._commentsData});
+        break;
+      case CREATE_COMMENT:
+        this._comments.update({typeDataChange, value: value.comments});
+        break;
+      case RATING:
+        if(this._userRating) {
+          this._userRating.update(this._movieData.user_details.personal_rating);
+        }
+        break;
+    }
+  }
 
-              <table class="film-details__table">
-                <tr class="film-details__row">
-                  <td class="film-details__term">Director</td>
-                  <td class="film-details__cell">${this._director}</td>
-                </tr>
-                <tr class="film-details__row">
-                  <td class="film-details__term">Writers</td>
-                  <td class="film-details__cell">${this._writers.map((writer) => writer).join(`, `)}</td>
-                </tr>
-                <tr class="film-details__row">
-                  <td class="film-details__term">Actors</td>
-                  <td class="film-details__cell">${this._actors.map((actor) => actor).join(`, `)}</td>
-                </tr>
-                <tr class="film-details__row">
-                  <td class="film-details__term">Release Date</td>
-                  <td class="film-details__cell">${moment(this._releaseDate).format(`DD MMM YYYY`)}</td>
-                </tr>
-                <tr class="film-details__row">
-                  <td class="film-details__term">Runtime</td>
-                  <td class="film-details__cell">${this._runtime}</td>
-                </tr>
-                <tr class="film-details__row">
-                  <td class="film-details__term">Country</td>
-                  <td class="film-details__cell">${this._release_country}</td>
-                </tr>
-                <tr class="film-details__row">
-                  <td class="film-details__term">${this._genre.length > 1 ? `Genres` : `Genre`}</td>
-                  <td class="film-details__cell">
-                  ${Array.from(this._genre).map((genre) => `<span class="film-details__genre">${genre}</span>`).join(``)}
-                </tr>
-              </table>
+  _renderComments() {
+    const container = this._movie.getElement().querySelector(`.form-details__bottom-container`);
+    this._comments.init(container);
+  }
 
-              <p class="film-details__film-description">
-                ${this._description}
-              </p>
-            </div>
-          </div>
-        </div>
+  _remove(elem) {
+    unrender(elem.getElement());
+    elem.removeElement();
+  }
 
-        <div class="form-details__bottom-container">
+  unrender() {
+    this._comments.unrender();
+    this._remove(this._movie);
+    this._remove(this._btnControls);
 
-    </div>
-  </form>
-  </section>`;
+    if(this._userRating) {
+      this._unrenderUserRating();
+    }
   }
 }

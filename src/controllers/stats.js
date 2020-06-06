@@ -50,22 +50,18 @@ export default class StatsController {
     const movieGenre = this._getGenresMovie(movieData);
 
     const countMovie = this._getCountMovie(movieGenre);
-    const topGenre = Object.entries(movieGenre).sort((a, b) => b[1] - a[1]);
+    const topGenre = Object.entries(movieGenre).sort((a, b) => b[1] - a[1])[0][0];
 
-    const resultTest = topGenre.reduce((res, genre) => {
-      res[genre[0]] = movieGenre[genre[0]];
-      return res;
-    }, {});
+    // const resultTest = topGenre.reduce((res, genre) => {
+    //   res[genre[0]] = movieGenre[genre[0]];
+    //   return res;
+    // }, {});
 
-    const testnew = Object.entries(movieGenre)
-      .map(([ key, val ]) => ({ ...val, id: key }))
-      .sort((a, b) => b.id - a.id)
-
-    this._list.getValue(countMovie, duration, topGenre[0][0])
+    this._list.getValue(countMovie, duration, topGenre)
 
     const container = this._chartWrap.getElement().querySelector(`.statistic__chart`);
     container.height = STATS_PARAMS.BAR_HEIGHT * Object.keys(movieGenre).length;
-    this._renderChart(container, resultTest);
+    this._renderChart(container, movieGenre);
   }
 
   show(movieData, commentsData) {
@@ -115,7 +111,6 @@ export default class StatsController {
           display: false,
           ticks: {
             suggestedMin: STATS_PARAMS.MIN_X_LIMIT,
-            // suggestedMax: maxXLimit
           }
         }],
         yAxes: [{

@@ -75,32 +75,30 @@ export default class MovieDetailsController{
     this._btnControls.init(container);
   }
 
-  _updateData(typeData, data) {
-    console.log(typeData, data)
-    if(typeData === (REMOVE_COMMENT || CREATE_COMMENT)) {
-      this._movieData.comments = data.movie;
-      this._commentsData = data.comments;
-      console.log(data.comments)
-      console.log(this._commentsData)
-    } else if (typeData === DATA_CHANGE_USER_DETAILS) {
-      this._movieData.user_details = data;
+  _updateData({typeDataChange, value}) {
+    console.log(value)
+    if(typeDataChange === (REMOVE_COMMENT || CREATE_COMMENT)) {
+      this._movieData.comments = value.movie;
+      console.log(this._movieData)
+      this._commentsData = value.comments;
+    } else if (typeDataChange === DATA_CHANGE_USER_DETAILS) {
+      this._movieData.user_details = value;
     }
   }
 
-  update(typeData, data) {
-    this._updateData(typeData, data);
-    console.log(this._commentsData)
-
-    switch (typeData) {
+  update({typeDataChange, value}) {
+    console.log(value)
+    this._updateData({typeDataChange, value});
+    switch (typeDataChange) {
       case DATA_CHANGE_USER_DETAILS:
         this._btnControls.update(this._movieData.user_details.watchlist, this._movieData.user_details.already_watched, this._movieData.user_details.favorite)
         this._toggleUserRating();
         break;
       case REMOVE_COMMENT:
-        this._comments.update(this._commentsData);
+        this._comments.update({typeDataChange, value: this._commentsData});
         break;
       case CREATE_COMMENT:
-        this._comments.update(data.comments);
+        this._comments.update({typeDataChange, value: value.comments});
         break;
       case RATING:
         if(this._userRating) {

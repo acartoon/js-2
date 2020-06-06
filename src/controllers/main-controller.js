@@ -57,62 +57,67 @@ export default class MainPageController {
     this._mainNavController.show();
   }
 
-  onDataChange(typeData, movieId, data) {
-  // onDataChange({typeDataChange, movieId, userDetails, commentsData}) {
-    this._dataChangeType = DATA_CHANGE_TYPE[typeData];
-    let idDataChange = movieId;
-    this._movieIndex = this._movieData.findIndex((i) => i.id === idDataChange);
+  // onDataChange(typeData, movieId, data) {
+  onDataChange({typeDataChange, movieId, value}) {
+    this._dataChangeType = DATA_CHANGE_TYPE[typeDataChange];
+    this._movieIndex = this._movieData.findIndex((i) => i.id === movieId);
+    console.log(this._movieData[this._movieIndex])
     this._initTmpData(this._movieData[this._movieIndex])
-    switch (typeData) {
+    switch (typeDataChange) {
       case DATA_CHANGE.WATCHLIST:
-        this._tmpData.user_details.watchlist = data;
+        this._tmpData.user_details.watchlist = value;
         break;
         case DATA_CHANGE.FAVORITE:
-          this._tmpData.user_details.favorite = data;
+          this._tmpData.user_details.favorite = value;
         break;
       case DATA_CHANGE.ALREADY_WATCHED:
-        this._tmpData.user_details.already_watched = data;
+        this._tmpData.user_details.already_watched = value;
         if(!this._tmpData.user_details.already_watched) {
           this._tmpData.user_details.personal_rating = 0;
         }
         break;
       case DATA_CHANGE.RATING:
-        this._tmpData.user_details.personal_rating = data;
-        // this._tmpData.user_details.watching_date = new Date();
+        this._tmpData.user_details.personal_rating = value;
         break;
       case DATA_CHANGE.CREATE_COMMENT:
-        this._tmpData = data;
+        this._tmpData = value;
         break;
       case DATA_CHANGE.REMOVE_COMMENT:
-        idDataChange = data;
+        console.log(this._movieData[this._movieIndex])
+        this._tmpData = value;
         break;
     }
-    this._onDataChangeMain(this._dataChangeType, idDataChange, this._tmpData);
+    this._onDataChangeMain({typeDataChange: this._dataChangeType, movie: this._movieData[this._movieIndex], value: this._tmpData});
     this._resetTmpData();
   }
 
   update({movie, comments}) {
-    let newMovieData;
-    const movieId = this._movieData[this._movieIndex].id;
     console.log(movie)
-    this._movieData[this._movieIndex] = movie;
+    let value;
+    const movieId = this._movieData[this._movieIndex].id;
+    this._movieData[this._movieIndex] = cloneDeep(movie);
+
     switch (this._dataChangeType) {
       case REMOVE_COMMENT:
-        newMovieData = this._movieData[this._movieIndex][`comments`];
+        value = {}
+        value[`movie`] = this._movieData[this._movieIndex][`comments`];
+        value[`comments`] = comments;
         break;
       case (DATA_CHANGE_USER_DETAILS):
-        newMovieData = this._movieData[this._movieIndex].user_details
+        value = this._movieData[this._movieIndex].user_details
         break;
       case (RATING):
-        newMovieData = this._movieData[this._movieIndex].user_details
+        value = this._movieData[this._movieIndex].user_details
         break;
       case CREATE_COMMENT:
-        newMovieData = {}
-        newMovieData[`movie`] = this._movieData[this._movieIndex][`comments`];
-        newMovieData[`comments`] = comments;
+        value = {}
+        value[`movie`] = this._movieData[this._movieIndex][`comments`];
+        value[`comments`] = comments;
         break;
     }
-    this._activeWindow.update(this._dataChangeType, movieId, newMovieData, comments);
+    //тут норм
+    console.log(this._movieData[this._movieIndex])
+    this._activeWindow.update({typeDataChange: this._dataChangeType, movieId: movieId, value: value});
     this._mainNavController.init(this._movieData);
   }
 

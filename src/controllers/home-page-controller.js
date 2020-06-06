@@ -65,42 +65,40 @@ export default class HomePageController {
     return mostCommentedMovie.slice(0, this._EXTRA_COUNT_MOVIE);
   }
 
-  _rerendMainBoard(movieData, flag) {
-    this._mainBoard.render(movieData, flag);
-  }
-
   // сортировка
   _onSortBtnClick(sortType) {
+    console.log(sortType)
     const movieDataToRender = {
-      date: this._mainBoardData.slice().sort((a, b) => a.film_info.release.date - b.film_info.release.date),
+      date: this._mainBoardData.slice().sort((a, b) => Date.parse(a.film_info.release.date) - Date.parse(b.film_info.release.date)),
       rating: this._mainBoardData.slice().sort((a, b) => b.film_info.total_rating - a.film_info.total_rating),
       default: this._mainBoardData,
     };
-    this._rerendMainBoard(movieDataToRender[sortType], filterFlag.save);
+    this._mainBoard.render(movieDataToRender[sortType], filterFlag.save);
+  }
+  onDataChange(data) {
+    this._onDataChangeMain(data);
   }
 
-  onDataChange(typeData, movieId, data, movie) {
-    this._onDataChangeMain(typeData, movieId, data, movie);
-  }
-
-  _updateData(typeData, movieId, data) {
+  _updateData({typeDataChange, movieId, value}) {
+    console.log(value)
     const index = this._movieData.findIndex((i) => i.id === movieId);
-    if(typeData === REMOVE_COMMENT) {
-      this._movieData[index].comments = data;
-    } else if(typeData === CREATE_COMMENT) {
-      this._movieData[index].comments = data.comments;
-    } else if(typeData === DATA_CHANGE_USER_DETAILS || typeData === RATING) {
-      this._movieData[index].user_details = data;
+    if(typeDataChange === REMOVE_COMMENT) {
+      this._movieData[index].comments = value.movie;
+    } else if(typeDataChange === CREATE_COMMENT) {
+      this._movieData[index].comments = value.movie;
+    } else if(typeDataChange === DATA_CHANGE_USER_DETAILS || typeDataChange === RATING) {
+      this._movieData[index].user_details = value;
     }
   }
 
-  update(typeData, movieId, data, comments = false) {
-    this._updateData(typeData, movieId, data);
-    this._mainBoard.updateMovie(typeData, movieId, data, comments);
-    this._topRated.updateMovie(typeData, movieId, data, comments);
-    this._mostCommented.updateMovie(typeData, movieId, data, comments);
+  // update(typeData, movieId, data, comments = false) {
+  update({typeDataChange, movieId, value}) {
+    this._updateData({typeDataChange, movieId, value});
+    this._mainBoard.updateMovie({typeDataChange, movieId, value});
+    this._topRated.updateMovie({typeDataChange, movieId, value});
+    this._mostCommented.updateMovie({typeDataChange, movieId, value});
 
-    switch(typeData) {
+    switch(typeDataChange) {
       case REMOVE_COMMENT:
         this._mostCommented.updateBoard(this._getMostCommentedMovie(this._movieData));
       case CREATE_COMMENT:

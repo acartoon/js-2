@@ -18,19 +18,19 @@ export default class MovieCard extends MovieBaseComponent {
   }
 
 
-  _updateData(typeData, data) {
-    if(typeData === DATA_CHANGE_USER_DETAILS) {
-      this._user_details = data
-    } else if(typeData === REMOVE_COMMENT || typeData === CREATE_COMMENT) {
-      this._comments = data;
+  _updateData({typeDataChange, value}) {
+    if(typeDataChange === DATA_CHANGE_USER_DETAILS) {
+      this._user_details = value
+    } else if(typeDataChange === REMOVE_COMMENT || typeDataChange === CREATE_COMMENT) {
+      this._comments = value;
     }
   }
 
-  update(typeData, data) {
-    this._updateData(typeData, data);
-    if(typeData === DATA_CHANGE_USER_DETAILS) {
+  update({typeDataChange, value}) {
+    this._updateData({typeDataChange, value});
+    if(typeDataChange === DATA_CHANGE_USER_DETAILS) {
       this._updateBtnControls();
-    } else if(typeData === REMOVE_COMMENT || typeData === CREATE_COMMENT) {
+    } else if(typeDataChange === REMOVE_COMMENT || typeDataChange === CREATE_COMMENT) {
       this._updateCommentsCount(this._comments.length)
     }
   }

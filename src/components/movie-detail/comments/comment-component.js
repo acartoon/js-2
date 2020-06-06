@@ -12,6 +12,7 @@ export default class CommentComponent extends AbstractComponent {
     this._author = author;
     this._date = date;
     this._onDataChange = onDataChange;
+    this._titleBtn = `Deleting…`;
 
     this._onClick();
   }
@@ -35,11 +36,11 @@ export default class CommentComponent extends AbstractComponent {
   _onClick() {
     const deleteBtn = this.getElement().querySelector(`.film-details__comment-delete`);
     deleteBtn.addEventListener(`click`, (evt) => {
-      deleteBtn.innerHTML = `Deleting…`;
+      deleteBtn.innerHTML = this._titleBtn;
       deleteBtn.disabled = true;
       evt.preventDefault();
       console.log(this)
-      this._onDataChange(DATA_CHANGE.REMOVE_COMMENT, this);
+      this._onDataChange({typeDataChange: DATA_CHANGE.REMOVE_COMMENT, value: this});
     });
   }
 

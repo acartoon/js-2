@@ -1,16 +1,19 @@
 import StatsComponent from "../components/stats";
-import { render, showElement, hideElement, getCountFilms, STATS_PARAMS } from "../utils";
+import { render, showElement, hideElement, getCountFilms, STATS_PARAMS, STATS_TYPE_FILTER } from "../utils";
 import moment from 'moment';
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import StatsFilterComponent from "../components/stats-flter";
 import StatsListComponent from "../components/stats-list";
 import ChartWrapComponent from "../components/chart-wrap";
+
+
 export default class StatsController {
   constructor(container) {
     this._container = container;
     this._stats = new StatsComponent(this._container);
-    this._filter = new StatsFilterComponent(this._container);
+    this._onFilterBtnClick = this._onFilterBtnClick.bind(this);
+    this._filter = new StatsFilterComponent(this._container, this._onFilterBtnClick);
     this._list = new StatsListComponent(this._container);
     this._chartWrap = new ChartWrapComponent(this._container);
     this._init();
@@ -28,31 +31,76 @@ export default class StatsController {
     this.hide()
   }
 
+
+  _onFilterBtnClick(filter) {
+    const filterType = {
+      all: this._allMovieData,
+      today: this._allMovieData.filter((movie) => moment(movie.user_details.watching_date).isSame(moment(), 'day')),
+      week: this._allMovieData.filter((movie) => moment(movie.user_details.watching_date).isSame(moment(), 'week')),
+      month: this._allMovieData.filter((movie) => moment(movie.user_details.watching_date).isSame(moment(), 'month')),
+      year: this._allMovieData.filter((movie) => moment(movie.user_details.watching_date).isSame(moment(), 'year')),
+
+    };
+    this._destroyChart();
+    this._initStats(filterType[filter]);
+  }
+
+  _initStats(movieData) {
+    const duration = this._getDurationWachedMovie(movieData);
+    const movieGenre = this._getGenresMovie(movieData);
+
+    const countMovie = this._getCountMovie(movieGenre);
+    const topGenre = Object.entries(movieGenre).sort((a, b) => b[1] - a[1]);
+
+    const resultTest = topGenre.reduce((res, genre) => {
+      res[genre[0]] = movieGenre[genre[0]];
+      return res;
+    }, {});
+
+    const testnew = Object.entries(movieGenre)
+      .map(([ key, val ]) => ({ ...val, id: key }))
+      .sort((a, b) => b.id - a.id)
+
+    this._list.getValue(countMovie, duration, topGenre[0][0])
+
+    const container = this._chartWrap.getElement().querySelector(`.statistic__chart`);
+    container.height = STATS_PARAMS.BAR_HEIGHT * Object.keys(movieGenre).length;
+    this._renderChart(container, resultTest);
+  }
+
   show(movieData, commentsData) {
     this._allMovieData = movieData;
     this._commentsData = commentsData;
     this._movieData = this._allMovieData.filter((movie) => movie.user_details.already_watched === true);
+
     this._show();
-
-    const duration = this._getDurationWachedMovie();
-    const movieGenre = this._getGenresMovie();
-    const topGenre = Object.entries(movieGenre).sort((a, b) => b[1] - a[1])[0]
-
-
-    // this._renderChart(movieGenre);
+    this._initStats(this._allMovieData);
   }
 
-  _renderChart(movieGenre) {
-    const chartData = {
-      labels: Object.keys(movieGenre),
-      datasets: [{
-        data: Object.values(movieGenre),
-        backgroundColor: STATS_PARAMS.GENRE_COLOR,
+  _getCountMovie(movieGenre) {
+    return Object.keys(movieGenre).reduce((res, movie) => {
+      return res + movieGenre[movie];
+    }, 0);
+  }
 
-      }]
-    };
+  _getDurationWachedMovie(moveiData) {
+    return moveiData.reduce((result, movie) => {
+      result += movie.film_info.runtime;
+      return result;
+    }, 0);
+  }
 
-    const chartOptions = {
+  _getGenresMovie(movieData) {
+     return movieData.reduce((res, movie) => {
+      movie.film_info.genre.forEach(genre => {
+        res[genre] = res[genre] ? ++res[genre]: 1;
+      });
+      return res;
+    }, {});
+  }
+
+  _getChartOptions() {
+    return {
       plugins: {
         datalabels: {
           color: STATS_PARAMS.LABEL_COLOR,
@@ -88,46 +136,39 @@ export default class StatsController {
       tooltips: {
         enabled: false
       },
+    }
+  };
+
+  _getChartData(movieGenre) {
+    return {
+      labels: Object.keys(movieGenre),
+      datasets: [{
+        data: Object.values(movieGenre),
+        backgroundColor: STATS_PARAMS.GENRE_COLOR,
+
+      }]
     };
+  }
 
-    const ctx = this._chartWrap.getElement().querySelector(`.statistic__chart`);
-    ctx.height = STATS_PARAMS.BAR_HEIGHT * Object.keys(movieGenre).length;
+  _destroyChart() {
+    if (this._chart !== null) {
+      this._chart.destroy();
+      this._chart = null;
+    }
+  }
 
-    var myBarChart = new Chart(ctx, {
+  _renderChart(container, movieGenre) {
+    this._chart = new Chart(container, {
       type: STATS_PARAMS.CHART_TYPE,
-      data: chartData,
+      data: this._getChartData(movieGenre),
       responsive: true,
       maintainAspectRatio: false,
       showTooltips: false,
       plugins: [ChartDataLabels],
-      options: chartOptions
-  });
+      options: this._getChartOptions(),
+    });
   }
 
-  _getGenresMovie() {
-     return this._movieData.reduce((res, movie) => {
-      movie.film_info.genre.forEach(genre => {
-        res[genre] = res[genre] ? ++res[genre]: 1;
-      });
-      return res;
-    }, {});
-  }
-
-
-  _destroyChart() {
-    if (this._statisticChart !== null) {
-      this._statisticChart.destroy();
-      this._statisticChart = null;
-    }
-  }
-
-
-  _getDurationWachedMovie() {
-    return this._movieData.reduce((result, movie) => {
-      result += movie.film_info.runtime;
-      return result;
-    }, 0);
-  }
 
   _show() {
     showElement(this._stats.getElement())

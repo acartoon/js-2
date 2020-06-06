@@ -26,12 +26,11 @@ export default class MovieController {
   }
 
 
-  onDataChange(typeData, data) {
-    this.onDataChangeMain(typeData, this._movieData.id, data, this);
+  onDataChange({typeDataChange, value}) {
+    this.onDataChangeMain({typeDataChange: typeDataChange, movieId: this._movieData.id, value: value});
   }
 
   _onMovieClick() {
-    console.log(this._api.getComments)
     this._api.getComments(this._movieData.id)
       .then((data) => {
         this._renderMovieDetails(data);
@@ -43,42 +42,25 @@ export default class MovieController {
     this._movieDetails.init(this._mainContainer);
   }
 
-  _updateData(typeData, movieData, comments) {
-    if(typeData === REMOVE_COMMENT) {
-      this._movieData.comments = movieData;
-    } else if (typeData === CREATE_COMMENT) {
-      this._movieData.comments = movieData.comments;
-    } else if (typeData === DATA_CHANGE_USER_DETAILS || typeData === RATING) {
-      this._movieData.user_details = movieData;
+  _updateData({typeDataChange, value}) {
+    if(typeDataChange === REMOVE_COMMENT) {
+      this._movieData.comments = value;
+    } else if (typeDataChange === CREATE_COMMENT) {
+      this._movieData.comments = value.comments;
+    } else if (typeDataChange === DATA_CHANGE_USER_DETAILS || typeData === RATING) {
+      this._movieData.user_details = value;
     }
   }
 
-  update(typeData, movieData, comments) {
-    this._updateData(typeData, movieData, comments);
+  update({typeDataChange, value}) {
+    console.log(typeDataChange, value)
+    this._updateData({typeDataChange, value});
 
-    if(typeData === DATA_CHANGE_USER_DETAILS) {
-      this._movie.update(typeData, this._movieData.user_details);
-    } else if (typeData === REMOVE_COMMENT || typeData === CREATE_COMMENT) {
-      this._movie.update(typeData, this._movieData.comments);
+    if(typeDataChange !== RATING) {
+      this._movie.update({typeDataChange, value});
     }
     if(this._movieDetails) {
-      if(typeData === REMOVE_COMMENT) {
-        this._api.getComments(this._movieData.id)
-        .then((data) => {
-          const movieData = [];
-          movieData.movie = this._movieData;
-          movieData.comments = data;
-          this._movieDetails.update(typeData, movieData);
-        });
-        return;
-      } else if(typeData === CREATE_COMMENT) {
-        const movieData = [];
-        movieData.movie = this._movieData;
-        movieData.comments = comments;
-        this._movieDetails.update(typeData, movieData);
-      } else {
-        this._movieDetails.update(typeData, this._movieData.user_details);
-      }
+      this._movieDetails.update({typeDataChange, value});
     }
   }
 

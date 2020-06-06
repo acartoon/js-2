@@ -1,4 +1,4 @@
-import {render, unrender, KEY_CODE, DATA_CHANGE, EMOJIS, getRandomString} from '../utils.js';
+import {render, unrender, KEY_CODE, DATA_CHANGE, EMOJIS, getRandomString, Position, REMOVE_COMMENT, CREATE_COMMENT} from '../utils.js';
 import MovieCommentsContainer from '../components/movie-detail/comments/movie-comments-container.js';
 import CommentsList from '../components/movie-detail/comments/comments-list.js';
 import CommentComponent from '../components/movie-detail/comments/comment-component.js';
@@ -26,16 +26,16 @@ export default class CommentsController{
     this._renderNewComments();
   }
 
-  onDataChange(dataType, comment) {
-    this._activeComment = comment;
-    this._onDataChangeMain(dataType, this._activeComment.id)
+  onDataChange({typeDataChange, value}) {
+    this._activeComment = value;
+    this._onDataChangeMain({typeDataChange: typeDataChange, value: this._activeComment.id})
   }
 
   _onDocumentKeyDown(e) {
     if(e.key === KEY_CODE.ENTER && (e.ctrlKey || e.metaKey)) {
       const comment = e.target.value;
       const message = this._createNewMessage(this._selectedEmotion, comment);
-      this._onDataChangeMain(DATA_CHANGE.CREATE_COMMENT, message);
+      this._onDataChangeMain({typeDataChange: DATA_CHANGE.CREATE_COMMENT, value: message});
     }
   }
 
@@ -44,11 +44,21 @@ export default class CommentsController{
     document.addEventListener(`keydown`, this._onDocumentKeyDown)
   }
 
-  update(data) {
-    this._commentsData = data;
-    this._commentsList.getElement().innerHTML = ``;
-    this._renderComments();
+  update({typeDataChange, value}) {
+    console.log(value)
+    this._commentsData = value;
     this._movieCommentsContainer.update(this._commentsData.length);
+
+    switch (typeDataChange) {
+      case CREATE_COMMENT:
+        const commentComponent = new CommentComponent(this._commentsData[this._commentsData.length-1], this.onDataChange);
+        render(this._commentsList.getElement(), commentComponent.getElement(), Position.BEFOREEND);
+        break;
+      case REMOVE_COMMENT:
+        console.log(`sdlkfj`)
+        this._activeComment.remove();
+        break;
+    }
   }
 
   _createNewMessage(emotion, comment) {

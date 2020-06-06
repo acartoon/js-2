@@ -18,8 +18,10 @@ export default class MovieBoard {
   }
 
   //тоже вопрос, подвтор данных movieId и movie??????
-  onDataChange(typeData, movieId, data, movie) {
-    this._onDataChangeMain(typeData, movieId, data, movie);
+  //врятли нужна деструктуризация
+  // onDataChange(typeData, movieId, data, movie) {
+  onDataChange(data) {
+    this._onDataChangeMain(data);
   }
 
   hide() {
@@ -38,23 +40,21 @@ export default class MovieBoard {
     });
   }
 
-  _updateData(typeData, movieId, data) {
+  _updateData({typeDataChange, movieId, value}) {
     const index = this._movieData.findIndex((i) => i.id === movieId);
     if(index === -1) {
       return;
     }
-    if(typeData === REMOVE_COMMENT) {
-      this._movieData[index].comments = data;
-    } else if(typeData === CREATE_COMMENT) {
-      this._movieData[index].comments = data.comments;
-    } else if(typeData === DATA_CHANGE_USER_DETAILS || typeData === RATING) {
-      this._movieData[index].user_details = data;
+    if(typeDataChange === REMOVE_COMMENT || typeDataChange === CREATE_COMMENT) {
+      this._movieData[index].comments = value.movie;
+    } else if(typeDataChange === DATA_CHANGE_USER_DETAILS || typeDataChange === RATING) {
+      this._movieData[index].user_details = value;
     }
   }
 
-  updateMovie(typeData, movieId, data, comments) {
-    this._updateData(typeData, movieId, data, comments)
-    this._updateMovie(typeData, movieId, data, comments);
+  updateMovie(data) {
+    this._updateData(data)
+    this._updateMovie(data);
   }
 
   updateBoard(movieData, commentsData) {
@@ -64,10 +64,10 @@ export default class MovieBoard {
     this._renderMovie(this._movieData);
   }
 
-  _updateMovie(typeData, movieId, data, comments) {
+  _updateMovie({typeDataChange, movieId, value}) {
     this._subscriptions.forEach((movieCard) => {
       if(movieCard._movieData.id === movieId) {
-        movieCard.update(typeData, data, comments);
+        movieCard.update({typeDataChange, value});
       }
     });
   }

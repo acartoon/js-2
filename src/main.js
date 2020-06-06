@@ -1,7 +1,7 @@
 // import {movie, comments} from './data.js';
 import MainController from './controllers/main-controller.js';
 import API from './controllers/api.js';
-import { CREATE_COMMENT, REMOVE_COMMENT, DATA_CHANGE_USER_DETAILS } from './utils.js';
+import { CREATE_COMMENT, REMOVE_COMMENT, DATA_CHANGE_USER_DETAILS, RATING } from './utils.js';
 import Store from "./controllers/store";
 import Provider from './controllers/provider.js';
 const MOVIE_STORE_KEY = `movie-store-key`;
@@ -20,25 +20,33 @@ const api = new API({endPoint: END_POINT, authorization: AUTHORIZATION});
 const store = new Store({storage: window.localStorage, key: MOVIE_STORE_KEY});
 const provider = new Provider({api, store});
 
-const onDataChange = ((action, id, array) => {
-  switch (action) {
+// const onDataChange = ((action, id, array) => {
+const onDataChange = (({typeDataChange, movie, value}) => {
+
+  console.log(movie)
+  switch (typeDataChange) {
     case CREATE_COMMENT:
-      provider.createComment(id, array).
+      provider.createComment(movie.id, value).
       then(({movie, comments}) => {
+        console.log(movie, comments)
         mainController.update({movie, comments})
       });
       break;
     case REMOVE_COMMENT:
-      provider.removeComment(id, array).
-        then(() => {
-          provider.updateMovie(array.id, array).
-          then((movie) => {
-            mainController.update({movie: movie});
-          });
+      provider.removeComment(value, movie).
+        then(({movie, comments}) => {
+          console.log(movie, comments)
+          mainController.update({movie, comments});
         });
       break;
     case DATA_CHANGE_USER_DETAILS:
-      provider.updateMovie(id, array).
+      provider.updateMovie(movie.id, value).
+        then((movie) => {
+          mainController.update({movie: movie});
+        });
+      break;
+    case RATING:
+      provider.updateMovie(movie.id, value).
         then((movie) => {
           mainController.update({movie: movie});
         });

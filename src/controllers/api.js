@@ -41,7 +41,6 @@ export default class API {
   }
 
   updateMovie(id, data) {
-    console.log(data)
     return this._load({
       url: `movies/${id}`,
       method: Method.PUT,
@@ -49,7 +48,7 @@ export default class API {
       headers: new Headers({'Content-Type': `application/json`})
     })
       .then(toJSON)
-      .then();
+      .then((test) => {console.log(test); return test})
   }
 
   // deleteTask({id}) {

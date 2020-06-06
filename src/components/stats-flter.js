@@ -1,17 +1,17 @@
 import AbstractComponent from './abstract-component.js';
 
 export default class StatsFilterComponent extends AbstractComponent {
-  constructor(container, onStatsLabelClick) {
+  constructor(container, onClick) {
     super();
-    // this._onStatsLabelClick = onStatsLabelClick();
+    this._onClick = onClick;
+    this._activeFilter = `all`;
     this._onLabelClick = this._onLabelClick.bind(this);
-    this._removeStr = /statistic-/;
     this._render();
   }
 
   _render() {
     const filters = [
-      {value: `all-time`, label: `All time`},
+      {value: `all`, label: `All time`},
       {value: `today`, label: `Today`},
       {value: `week`, label: `Week`},
       {value: `month`, label: `Month`},
@@ -27,16 +27,16 @@ export default class StatsFilterComponent extends AbstractComponent {
   }
 
   _onLabelClick(evt) {
-
     if(evt.target.classList.contains(`statistic__filters-label`)) {
-      var newstr = evt.target.htmlFor.replace(this._removeStr, ``);
-      this._onStatsLabelClick(newstr);
+      const value = evt.target.htmlFor;
+      this.getElement().querySelector(`#statistic-${value}`).checked = true;
+      this._onClick(value);
     }
   }
 
   _filterItemTemplate(value, label) {
-    return `<input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-${value}" value="${value}" checked="">
-    <label for="statistic-${value}" class="statistic__filters-label">${label}</label>`
+    return `<input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-${value}" value="${value}" ${value === this._activeFilter ? 'checked' : ``}>
+    <label for="${value}" class="statistic__filters-label" >${label}</label>`
   }
 
   getTemplate() {

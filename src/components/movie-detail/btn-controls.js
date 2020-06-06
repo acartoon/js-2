@@ -42,17 +42,13 @@ export default class BtnControls extends AbstractComponent {
     });
   }
 
-  //при срабатывании onDataChange из main вернется срабатываение функции update
-  onDataChange(value) {
-    let data = null;
-    if(value === DATA_CHANGE.WATCHLIST) {
-      data = !this._watchlist
-    } else if(value ===  DATA_CHANGE.ALREADY_WATCHED) {
-      data = !this._already_watched
-    } else if(value === DATA_CHANGE.FAVORITE) {
-      data = !this._favorite
-    }
-    this.onDataChangeMain(value, data);
+  onDataChange({typeDataChange}) {
+    const value = {
+      [DATA_CHANGE.WATCHLIST]: !this._watchlist,
+      [DATA_CHANGE.ALREADY_WATCHED]: !this._already_watched,
+      [DATA_CHANGE.FAVORITE]: !this._favorite,
+    };
+    this.onDataChangeMain({typeDataChange: typeDataChange, value: value[typeDataChange]});
   }
 
   _updateData(watchlist, already_watched, favorite) {
@@ -62,17 +58,10 @@ export default class BtnControls extends AbstractComponent {
   }
 
   update(watchlist, already_watched, favorite) {
-    // this._watchlist = watchlist;
-    // this._already_watched = already_watched;
-    // this._favorite = favorite;
     this._updateData(watchlist, already_watched, favorite);
     this.getElement().innerHTML = ``;
     this._renderBtnControls(this._watchlist, this._already_watched, this._favorite);
   }
-
-  // reset() {
-
-  // }
 
   getTemplate() {
     return `<section class="film-details__controls">

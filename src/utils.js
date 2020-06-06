@@ -7,6 +7,16 @@ export const DATA_CHANGE_USER_DETAILS = `user_details`;
 export const RATING = `RATING`;
 export const USER_RATING_COUNT = 9;
 
+
+export const STATS_TYPE_FILTER = {
+  all: `all`,
+  today: `today`,
+  week: `week`,
+  month: `month`,
+  year: `year`,
+
+}
+
 // export const TYPE_CHANGE_DATA = {
 //   CREATE_COMMENT: `create`,
 //   REMOVE_COMMENT: `remove`,

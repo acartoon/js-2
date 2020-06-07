@@ -16,8 +16,8 @@ export default class StatsController {
     this._filter = new StatsFilterComponent(this._container, this._onFilterBtnClick);
     this._list = new StatsListComponent(this._container);
     this._chartWrap = new ChartWrapComponent(this._container);
+    this._chart = null;
     this._init();
-    this._allMovieData = [];
     this._commentsData = [];
     this._movieData = [];
   }
@@ -34,11 +34,11 @@ export default class StatsController {
 
   _onFilterBtnClick(filter) {
     const filterType = {
-      all: this._allMovieData,
-      today: this._allMovieData.filter((movie) => moment(movie.user_details.watching_date).isSame(moment(), 'day')),
-      week: this._allMovieData.filter((movie) => moment(movie.user_details.watching_date).isSame(moment(), 'week')),
-      month: this._allMovieData.filter((movie) => moment(movie.user_details.watching_date).isSame(moment(), 'month')),
-      year: this._allMovieData.filter((movie) => moment(movie.user_details.watching_date).isSame(moment(), 'year')),
+      all: this._movieData,
+      today: this._movieData.filter((movie) => moment(movie.user_details.watching_date).isSame(moment(), 'day')),
+      week: this._movieData.filter((movie) => moment(movie.user_details.watching_date).isSame(moment(), 'week')),
+      month: this._movieData.filter((movie) => moment(movie.user_details.watching_date).isSame(moment(), 'month')),
+      year: this._movieData.filter((movie) => moment(movie.user_details.watching_date).isSame(moment(), 'year')),
 
     };
     this._destroyChart();
@@ -46,16 +46,16 @@ export default class StatsController {
   }
 
   _initStats(movieData) {
+
+    if(movieData.length === 0) {
+      this._list.getValue(0, 0, `&ndash;`)
+      return;
+    }
     const duration = this._getDurationWachedMovie(movieData);
     const movieGenre = this._getGenresMovie(movieData);
 
-    const countMovie = this._getCountMovie(movieGenre);
+    const countMovie = movieData.length;
     const topGenre = Object.entries(movieGenre).sort((a, b) => b[1] - a[1])[0][0];
-
-    // const resultTest = topGenre.reduce((res, genre) => {
-    //   res[genre[0]] = movieGenre[genre[0]];
-    //   return res;
-    // }, {});
 
     this._list.getValue(countMovie, duration, topGenre)
 
@@ -65,18 +65,11 @@ export default class StatsController {
   }
 
   show(movieData, commentsData) {
-    this._allMovieData = movieData;
+    this._movieData = movieData.filter((movie) => movie.user_details.already_watched === true);
     this._commentsData = commentsData;
-    this._movieData = this._allMovieData.filter((movie) => movie.user_details.already_watched === true);
 
     this._show();
-    this._initStats(this._allMovieData);
-  }
-
-  _getCountMovie(movieGenre) {
-    return Object.keys(movieGenre).reduce((res, movie) => {
-      return res + movieGenre[movie];
-    }, 0);
+    this._initStats(this._movieData);
   }
 
   _getDurationWachedMovie(moveiData) {
@@ -170,6 +163,8 @@ export default class StatsController {
   }
 
   hide() {
+
+    this._destroyChart();
     hideElement(this._stats.getElement())
   }
 }

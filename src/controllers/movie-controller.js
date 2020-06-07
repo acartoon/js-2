@@ -47,13 +47,12 @@ export default class MovieController {
       this._movieData.comments = value;
     } else if (typeDataChange === CREATE_COMMENT) {
       this._movieData.comments = value.comments;
-    } else if (typeDataChange === DATA_CHANGE_USER_DETAILS || typeData === RATING) {
+    } else if (typeDataChange === DATA_CHANGE_USER_DETAILS || typeDataChange === RATING) {
       this._movieData.user_details = value;
     }
   }
 
   update({typeDataChange, value}) {
-    console.log(typeDataChange, value)
     this._updateData({typeDataChange, value});
 
     if(typeDataChange !== RATING) {

@@ -38,7 +38,6 @@ export default class MainPageController {
     this.onDataChange = this.onDataChange.bind(this);
   }
 
-
   _initTmpData(data) {
     this._tmpData = cloneDeep(data);
   }
@@ -57,11 +56,9 @@ export default class MainPageController {
     this._mainNavController.show();
   }
 
-  // onDataChange(typeData, movieId, data) {
   onDataChange({typeDataChange, movieId, value}) {
     this._dataChangeType = DATA_CHANGE_TYPE[typeDataChange];
     this._movieIndex = this._movieData.findIndex((i) => i.id === movieId);
-    console.log(this._movieData[this._movieIndex])
     this._initTmpData(this._movieData[this._movieIndex])
     switch (typeDataChange) {
       case DATA_CHANGE.WATCHLIST:
@@ -72,6 +69,7 @@ export default class MainPageController {
         break;
       case DATA_CHANGE.ALREADY_WATCHED:
         this._tmpData.user_details.already_watched = value;
+        this._tmpData.user_details.watching_date = new Date().toISOString();
         if(!this._tmpData.user_details.already_watched) {
           this._tmpData.user_details.personal_rating = 0;
         }
@@ -92,7 +90,6 @@ export default class MainPageController {
   }
 
   update({movie, comments}) {
-    console.log(movie)
     let value;
     const movieId = this._movieData[this._movieIndex].id;
     this._movieData[this._movieIndex] = cloneDeep(movie);
@@ -115,8 +112,6 @@ export default class MainPageController {
         value[`comments`] = comments;
         break;
     }
-    //тут норм
-    console.log(this._movieData[this._movieIndex])
     this._activeWindow.update({typeDataChange: this._dataChangeType, movieId: movieId, value: value});
     this._mainNavController.init(this._movieData);
   }

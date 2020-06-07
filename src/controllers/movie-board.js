@@ -17,10 +17,9 @@ export default class MovieBoard {
     this._renderMovie(this._movieData);
   }
 
-  //тоже вопрос, подвтор данных movieId и movie??????
-  //врятли нужна деструктуризация
-  // onDataChange(typeData, movieId, data, movie) {
+
   onDataChange(data) {
+    console.log(data)
     this._onDataChangeMain(data);
   }
 

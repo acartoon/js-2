@@ -1,18 +1,14 @@
 // import {movie, comments} from './data.js';
 import MainController from './controllers/main-controller.js';
-import API from './controllers/api.js';
+import API from './api/api.js';
 import { CREATE_COMMENT, REMOVE_COMMENT, DATA_CHANGE_USER_DETAILS, RATING } from './utils.js';
-import Store from "./controllers/store";
-import Provider from './controllers/provider.js';
+import Store from "./api/store";
+import Provider from './api/provider.js';
+import TitleComponent from './components/title-component.js';
+import FooterComponent from './components/footer-component.js';
+
+
 const MOVIE_STORE_KEY = `movie-store-key`;
-const bodyContainer = document.body;
-
-// const footerStatistics = document.querySelector(`.footer__statistics p`);
-// footerStatistics.innerHTML = `${movie.length} movies inside`;
-
-//////////////
-//// main.js
-//////////////
 const AUTHORIZATION = `Basic ${ new Date().valueOf() }`;
 const END_POINT = `https://htmlacademy-es-10.appspot.com/cinemaddict`;
 
@@ -20,10 +16,15 @@ const api = new API({endPoint: END_POINT, authorization: AUTHORIZATION});
 const store = new Store({storage: window.localStorage, key: MOVIE_STORE_KEY});
 const provider = new Provider({api, store});
 
-// const onDataChange = ((action, id, array) => {
+const bodyContainer = document.body;
+const main = document.querySelector(`.main`);
+const footer = document.querySelector(`.footer__statistics`);
+const footerStatistics = new FooterComponent(footer);
+const title = new TitleComponent(main);
+
+
 const onDataChange = (({typeDataChange, movie, value}) => {
 
-  console.log(movie)
   switch (typeDataChange) {
     case CREATE_COMMENT:
       provider.createComment(movie.id, value).
@@ -58,5 +59,13 @@ const onDataChange = (({typeDataChange, movie, value}) => {
 const mainController = new MainController(bodyContainer, onDataChange);
 
 provider.getMovie().then((data) => {
+  footerStatistics.innerHTML = `${data.length} movies inside`;
+  if(data.length === 0) {
+    title.initNoMovieTitle();
+    return;
+  }
+  title.remove();
+
+  footerStatistics.init(data.length)
   mainController.init(data, provider);
 });

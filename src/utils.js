@@ -17,6 +17,11 @@ export const STATS_TYPE_FILTER = {
 
 }
 
+export const CHANGE_STATES = {
+  INTINIAL: `intinial`,
+  CHANGE: `change`
+}
+
 // export const TYPE_CHANGE_DATA = {
 //   CREATE_COMMENT: `create`,
 //   REMOVE_COMMENT: `remove`,

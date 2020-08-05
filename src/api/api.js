@@ -20,7 +20,6 @@ export default class API {
   }
 
   removeComment(id) {
-    console.log(id)
     return this._load({
       url: `comments/${id}`,
       method: Method.DELETE,
@@ -37,7 +36,6 @@ export default class API {
       headers: new Headers({'Content-Type': `application/json`})
     })
       .then(toJSON);
-      // .then();
   }
 
   updateMovie(id, data) {
@@ -48,12 +46,8 @@ export default class API {
       headers: new Headers({'Content-Type': `application/json`})
     })
       .then(toJSON)
-      .then((test) => {console.log(test); return test})
   }
 
-  // deleteTask({id}) {
-  //   return this._load({url: `tasks/${id}`, method: Method.DELETE});
-  // }
 
   _load({url, method = Method.GET, body = null, headers = new Headers()}) {
     headers.append(`Authorization`, this._authorization);
@@ -65,14 +59,13 @@ export default class API {
       });
   }
 
-
-  // _send({url, method = Method.GET, body = null, headers = new Headers()}) {
-  //   headers.append(`Authorization`, this._authorization);
-
-  //   return fetch(`${this._endPoint}/${url}`, {method, body, headers})
-  //     .then(checkStatus)
-  //     .catch((err) => {
-  //       throw err;
-  //     });
-  // }
+  sync(data) {
+    return this._load({
+      url: `movies/sync`,
+      method: Method.POST,
+      body: JSON.stringify(data),
+      headers: new Headers({'Content-Type': `application/json`})
+    })
+    .then(toJSON)
+  }
 };

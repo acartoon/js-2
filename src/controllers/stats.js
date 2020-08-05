@@ -1,5 +1,5 @@
 import StatsComponent from "../components/stats";
-import { render, showElement, hideElement, getCountFilms, STATS_PARAMS, STATS_TYPE_FILTER } from "../utils";
+import { render, showElement, hideElement, getCountFilms, STATS_PARAMS, STATS_TYPE_FILTER, getRank, RANK } from "../utils";
 import moment from 'moment';
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
@@ -46,11 +46,11 @@ export default class StatsController {
   }
 
   _initStats(movieData) {
-
     if(movieData.length === 0) {
       this._list.getValue(0, 0, `&ndash;`)
       return;
     }
+
     const duration = this._getDurationWachedMovie(movieData);
     const movieGenre = this._getGenresMovie(movieData);
 
@@ -69,6 +69,8 @@ export default class StatsController {
     this._commentsData = commentsData;
 
     this._show();
+    const rank = getRank(movieData.length, RANK);
+    this._stats.init(rank)
     this._initStats(this._movieData);
   }
 
@@ -82,6 +84,7 @@ export default class StatsController {
   _getGenresMovie(movieData) {
      return movieData.reduce((res, movie) => {
       movie.film_info.genre.forEach(genre => {
+        // проверить этот ++ress
         res[genre] = res[genre] ? ++res[genre]: 1;
       });
       return res;
@@ -163,7 +166,7 @@ export default class StatsController {
   }
 
   hide() {
-
+    this._filter.default();
     this._destroyChart();
     hideElement(this._stats.getElement())
   }

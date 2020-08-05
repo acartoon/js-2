@@ -14,6 +14,7 @@ export default class EmojiLabel extends AbstractComponent {
       </label>`;
   }
 
+
   _onClick() {
     this.getElement().addEventListener(`click`, () => {
       this._onChangeEmotion(this._emotion);

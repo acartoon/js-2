@@ -1,5 +1,6 @@
 import MovieBoard from "./movie-board";
-import { render, Position } from "../utils";
+import { render, Position, unrender } from "../utils";
+import NoResult from "../components/no-result";
 
 export default class SearchController {
   constructor(mainContainer, container, onDataChangeMain, resultTitle) {
@@ -9,6 +10,7 @@ export default class SearchController {
     this._commentsData = null;
     this._searchData = null;
     this._resultTitle = resultTitle;
+    this._noResult = new NoResult();
   }
 
   init(searchData, movieData, commentsData) {
@@ -19,17 +21,25 @@ export default class SearchController {
       return movie.film_info.title.toLowerCase().includes(this._searchData.toLowerCase());
     });
 
-    if(resultData.length !== 0) {
-      this._resultTitle.init(resultData.length)
-      this._movieBoard = new MovieBoard(resultData, this._commentsData, this._container, this.onDataChangeMain);
-      this._movieBoard.init();
-    } else {
+    this._resultTitle.init(resultData.length)
 
+    if(resultData.length === 0) {
+      render(this._container, this._noResult.getElement())
+      return;
     }
+    this._movieBoard = new MovieBoard(resultData, this._commentsData, this._container, this.onDataChangeMain);
+    this._movieBoard.init();
+
   }
 
   update(data) {
-    console.log(data)
     this._movieBoard.updateMovie(data)
+  }
+
+  remove() {
+    unrender(this._noResult.getElement());
+    this._noResult.removeElement();
+    this._resultTitle.hide();
+
   }
 }

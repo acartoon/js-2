@@ -33,19 +33,24 @@ export default class CommentsController{
 
   _onDocumentKeyDown(e) {
     if(e.key === KEY_CODE.ENTER && (e.ctrlKey || e.metaKey)) {
-      const comment = e.target.value;
+      const comment = _.escape(e.target.value);
       const message = this._createNewMessage(this._selectedEmotion, comment);
+      this._newComment.resetError();
       this._onDataChangeMain({typeDataChange: DATA_CHANGE.CREATE_COMMENT, value: message});
     }
   }
 
-  onTextareaInput(e, selectedEmotion) {
+onError() {
+  this._newComment.onError();
+
+}
+
+  onTextareaInput(selectedEmotion) {
     this._selectedEmotion = selectedEmotion;
     document.addEventListener(`keydown`, this._onDocumentKeyDown)
   }
 
   update({typeDataChange, value}) {
-    console.log(value)
     this._commentsData = value;
     this._movieCommentsContainer.update(this._commentsData.length);
 
@@ -55,7 +60,6 @@ export default class CommentsController{
         render(this._commentsList.getElement(), commentComponent.getElement(), Position.BEFOREEND);
         break;
       case REMOVE_COMMENT:
-        console.log(`sdlkfj`)
         this._activeComment.remove();
         break;
     }

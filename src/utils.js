@@ -17,6 +17,8 @@ export const STATS_TYPE_FILTER = {
 
 }
 
+export const ANIMATION_TIMEOUT = 600;
+
 export const CHANGE_STATES = {
   INTINIAL: `intinial`,
   CHANGE: `change`
@@ -127,6 +129,7 @@ export const BOARDS_LIST = {
   ALL: {isExtra: false, title: `All movies. Upcoming`},
   TOP_RATED: {isExtra: true, title: `Top rated`},
   MOST_COMMENTED: {isExtra: true,  title: `Most commented`},
+  NO_MOVIE: {isExtra: false,  title: `There are no movies in our database`},
 }
 
 export const BTN_CARD_CONTROLS = {
@@ -260,3 +263,14 @@ export const checkStatus = (response) => {
 export const toJSON = (response) => {
   return response.json();
 };
+
+export const RANK = {
+  novice: `novice`,
+  fan: `fan`,
+  buff: `movie buff`,
+};
+
+export const getRank = (movieLength, RANK) => {
+  return movieLength < 10 ? RANK.novice :
+  movieLength > 20 ? RANK.baff : RANK.fan;
+}

@@ -29,13 +29,17 @@ export default class StatsFilterComponent extends AbstractComponent {
   _onLabelClick(evt) {
     if(evt.target.classList.contains(`statistic__filters-label`)) {
       const value = evt.target.htmlFor;
-      this.getElement().querySelector(`#statistic-${value}`).checked = true;
+      this.getElement().querySelector(`#${value}`).checked = true;
       this._onClick(value);
     }
   }
 
+  default() {
+    this.getElement().querySelector(`#all`).checked = true;
+  }
+
   _filterItemTemplate(value, label) {
-    return `<input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-${value}" value="${value}" ${value === this._activeFilter ? 'checked' : ``}>
+    return `<input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="${value}" value="${value}" ${value === this._activeFilter ? 'checked' : ``}>
     <label for="${value}" class="statistic__filters-label" >${label}</label>`
   }
 

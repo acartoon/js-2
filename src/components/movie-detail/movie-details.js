@@ -50,11 +50,11 @@ export default class MovieDetails extends MovieBaseComponent{
                 </tr>
                 <tr class="film-details__row">
                   <td class="film-details__term">Release Date</td>
-                  <td class="film-details__cell">${moment(this._releaseDate).format(`DD MMM YYYY`)}</td>
+                  <td class="film-details__cell">${moment(this._releaseDate).format(`DD MMMM YYYY`)}</td>
                 </tr>
                 <tr class="film-details__row">
                   <td class="film-details__term">Runtime</td>
-                  <td class="film-details__cell">${this._runtime}</td>
+                  <td class="film-details__cell">${moment.duration(this._runtime, `minutes`).format(`h[h] mm[m]`)}</td>
                 </tr>
                 <tr class="film-details__row">
                   <td class="film-details__term">Country</td>

@@ -1,39 +1,80 @@
 import AbstractComponent from '../../abstract-component.js';
 import RatingInput from './rating-input.js';
 import RatingLabel from './rating-label.js';
-import { render, USER_RATING_COUNT } from '../../../utils.js';
+import { render, USER_RATING_COUNT, DATA_CHANGE, ANIMATION_TIMEOUT } from '../../../utils.js';
+import { times } from 'lodash';
 
 export default class UserRating extends AbstractComponent{
-  constructor(rating, onDataChange) {
+  constructor(name, poster, rating, onDataChangeMain) {
     super();
     this._container = null;
     this._rating = rating;
-    this.onDataChange = onDataChange.bind(this);
-    this._containerS = this.getElement().querySelector('.film-details__user-rating-score');
+    this.onDataChangeMain = onDataChangeMain;
+    this._name = name;
+    this._poster = poster;
+    this._ratingContainer= this.getElement().querySelector('.film-details__user-rating-score');
+    // this._renderRatingBtn = this._renderRatingBtn.bind(this);
+    this._input = [];
+    this.onDataChange = this.onDataChange.bind(this);
   }
 
   init(container) {
     this._container = container;
     render(this._container, this.getElement());
     this._renderRatingBtn();
+    this._resetRating();
+  }
+
+  onError() {
+    this._enable();
+    this._ratingContainer.style.animation = `shake ${ANIMATION_TIMEOUT / 1000}s`;
+    this._activeRating.onRed();
+
+    setTimeout(() => {
+      this._ratingContainer.style.animation = ``
+    }, ANIMATION_TIMEOUT);
+  }
+
+  _enable() {
+    this._input.forEach((input) => input.enable());
+  }
+
+  onDataChange({rating}) {
+    if(this._activeRating) {
+      this._activeRating.reset();
+    }
+    this._activeRating = rating;
+    this._disable();
+    this.onDataChangeMain({typeDataChange: DATA_CHANGE.RATING,  value: rating.value})
+  }
+
+  _resetRating() {
+    const undo = this.getElement().querySelector(`.film-details__watched-reset`);
+    undo.addEventListener(`click`, () => {
+      this.onDataChange({typeDataChange: DATA_CHANGE.RATING, value: 0})
+    })
   }
 
   _renderRatingBtn() {
-    const container = this.getElement().querySelector('.film-details__user-rating-score');
-
     for(let i = 1; i <= USER_RATING_COUNT; i++) {
       let checked = (this._rating === i) ? true: false;
       let ratingInput = new RatingInput(i, checked);
       let ratingLabel = new RatingLabel(i, this.onDataChange);
-      render(this._containerS, ratingInput.getElement());
-      render(this._containerS, ratingLabel.getElement());
+
+      render(this._ratingContainer, ratingInput.getElement());
+      this._input.push(ratingLabel);
+      render(this._ratingContainer, ratingLabel.getElement());
     }
   }
 
   update(rating) {
     this._rating = rating;
-    this._containerS.innerHTML = ``;
+    this._ratingContainer.innerHTML = ``;
     this._renderRatingBtn();
+  }
+
+  _disable() {
+    this._input.forEach((input) => input.disable());
   }
 
   getTemplate() {
@@ -44,11 +85,11 @@ export default class UserRating extends AbstractComponent{
 
       <div class="film-details__user-score">
         <div class="film-details__user-rating-poster">
-          <img src="./images/posters/the-great-flamarion.jpg" alt="film-poster" class="film-details__user-rating-img">
+          <img src="${this._poster}" alt="film-poster" class="film-details__user-rating-img">
         </div>
 
         <section class="film-details__user-rating-inner">
-          <h3 class="film-details__user-rating-title">The Great Flamarion</h3>
+          <h3 class="film-details__user-rating-title">${this._name}</h3>
 
           <p class="film-details__user-rating-feelings">How you feel it?</p>
 

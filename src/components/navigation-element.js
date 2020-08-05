@@ -12,7 +12,7 @@ export default class NavigationElement extends AbstractComponent {
   }
   getTemplate() {
     return `<a href="#${this._anchor}" class="main-navigation__item ${this._active? this._activeClass : ``} ${this._anchor === `stats` ? `main-navigation__item--additional` : ``}
-    ">${this._title} ${this._count ? `<span class="main-navigation__item-count"> ${this._count} </span>` : ``}</a>`;
+    ">${this._title} ${this._count !== null ? `<span class="main-navigation__item-count"> ${this._count} </span>` : ``}</a>`;
   }
 
   init(onAction) {

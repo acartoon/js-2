@@ -52,7 +52,6 @@ export default class MovieBoardMore extends MovieBoard {
   }
 
   render(movieData, flag) {
-    console.log(movieData)
     this._movieData = movieData;
     this._countMovieToRender = (flag === filterFlag.save) ? this._countMovieToRender : this._STEP_TO_RENDER;
     if (this._movieData.length > this._countMovieToRender) {

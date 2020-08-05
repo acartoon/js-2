@@ -10,4 +10,12 @@ export default class RatingInput extends AbstractComponent{
   getTemplate() {
     return `<input type="radio" name="score" class="film-details__user-rating-input visually-hidden" value="${this._value}" id="rating-${this._value}" ${this._checked ? `checked`: ``}>`;
   }
+
+  disable() {
+    this.getElement().disabled = true;
+  };
+
+  enable() {
+    this.getElement().disabled = false;
+  }
 }

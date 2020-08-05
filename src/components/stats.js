@@ -1,6 +1,15 @@
 import AbstractComponent from './abstract-component.js';
 
 export default class StatsComponent extends AbstractComponent {
+  // constructor() {
+  //   super()
+  // };
+
+  init(rankName) {
+    const rank = this.getElement().querySelector(`.statistic__rank-label`);
+    rank.innerHTML = rankName;
+  };
+
 
   getTemplate() {
     return `<section class="statistic">

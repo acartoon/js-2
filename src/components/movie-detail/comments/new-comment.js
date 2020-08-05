@@ -1,5 +1,5 @@
 import AbstractComponent from '../../abstract-component.js';
-import {EMOJIS, render, Position, KEY_CODE} from '../../../utils.js';
+import {EMOJIS, render, Position, KEY_CODE, createElement, ANIMATION_TIMEOUT} from '../../../utils.js';
 import EmojiInput from './emoji-input.js';
 import EmojiLabel from './emoji-label.js';
 
@@ -18,12 +18,25 @@ export default class NewComment extends AbstractComponent {
     this._render();
     render(this._container, this.getElement());
 
-   this._initListeners();
+    window.addEventListener('offline',  this._onWindowOffline);
+
+   if(!this._isOnline()) {
+    this._onWindowOffline();
+   }
   }
 
-  _initListeners() {
-    window.addEventListener('online',  this._onWindowOnline);
-    window.addEventListener('offline',  this._onWindowOffline);
+  onError() {
+    this._shake();
+    this._inputComment.style.border = `2px solid red`;
+
+  }
+  _shake() {
+    const img = this.getElement().querySelector(`.film-details__add-emoji-label`).firstChild;
+    img.style.animation = `shake ${ANIMATION_TIMEOUT / 1000}s`
+
+    setTimeout(() => {
+      img.style.animation = ``
+    }, ANIMATION_TIMEOUT);
   }
 
   removeListeners() {
@@ -33,6 +46,7 @@ export default class NewComment extends AbstractComponent {
 
   _onWindowOffline() {
     this._inputComment.disabled = true;
+    window.addEventListener('online',  this._onWindowOnline);
   }
 
   _onWindowOnline() {
@@ -50,16 +64,29 @@ export default class NewComment extends AbstractComponent {
     this._onInput();
   }
 
+  _emojiTemplate() {
+    return `<img src="images/emoji/${this._selectedEmotion}.png" width="55" height="55" alt="${this._selectedEmotion}">`
+  }
+
   onChangeEmotion(emotion) {
     this._selectedEmotion = emotion;
     const container = this.getElement().querySelector(`.film-details__add-emoji-label`);
-    container.innerHTML = `<img src="images/emoji/${this._selectedEmotion}.png" width="55" height="55" alt="${this._selectedEmotion}">`;
+    container.innerHTML  = this._emojiTemplate();
+  }
+
+  resetError() {
+    console.log(`resetErr`)
+    this._inputComment.style.border = ``;
   }
 
   _onInput() {
-    this._inputComment.addEventListener(`input`, (e) => {
-      this._onTextareaInput(e, this._selectedEmotion);
+    this._inputComment.addEventListener(`input`, (evt) => {
+      this._onTextareaInput(this._selectedEmotion);
     });
+  }
+
+  _isOnline() {
+    return window.navigator.onLine;
   }
 
   getTemplate() {

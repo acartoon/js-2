@@ -7,13 +7,13 @@ export default class TitleComponent extends AbstractComponent {
     this._container = container;
     this._LOADING_TITLE = `Loading...`;
     this._NO_NOVIE = `There are no movies in our database`;
-    this._init();
   }
 
-  _init() {
+  init() {
     render(this._container, this.getElement())
   }
 
+  // нигде не используется
   initNoMovieTitle() {
     this.getElement().innerHTML = this._NO_NOVIE;
   }

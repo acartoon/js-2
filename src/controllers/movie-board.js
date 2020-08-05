@@ -10,6 +10,7 @@ export default class MovieBoard {
     this._api = api;
     this._onDataChangeMain = onDataChangeMain;
     this.onDataChange = this.onDataChange.bind(this);
+    this.onChangeView = this.onChangeView.bind(this);
     this._subscriptions = [];
   }
 
@@ -19,8 +20,11 @@ export default class MovieBoard {
 
 
   onDataChange(data) {
-    console.log(data)
     this._onDataChangeMain(data);
+  }
+
+  onChangeView() {
+    this._subscriptions.forEach((subscription) => subscription.setDefaultView());
   }
 
   hide() {
@@ -33,7 +37,7 @@ export default class MovieBoard {
 
   _renderMovie(movieData) {
     movieData.forEach((movie) => {
-      const movieCard = new MovieController(movie, this._api, this._boardContainer, this.onDataChange);
+      const movieCard = new MovieController(movie, this._api, this._boardContainer, this.onDataChange, this.onChangeView);
       this._subscriptions.push(movieCard);
       movieCard.init();
     });
@@ -61,6 +65,14 @@ export default class MovieBoard {
     this._commentsData = commentsData;
     this._boardContainer.innerHTML = ``;
     this._renderMovie(this._movieData);
+  }
+
+  onError({typeDataChange, movieId}) {
+    this._subscriptions.forEach((movieCard) => {
+      if(movieCard._movieData.id === movieId) {
+        movieCard.onError({typeDataChange});
+      }
+    });
   }
 
   _updateMovie({typeDataChange, movieId, value}) {

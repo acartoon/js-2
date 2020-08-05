@@ -1,7 +1,7 @@
 import HomePageController from "./home-page-controller.js";
 import Search from "../components/search.js";
 import Profile from "../components/profile.js";
-import { render, DATA_CHANGE, DATA_CHANGE_TYPE, DATA_CHANGE_USER_DETAILS, CREATE_COMMENT, REMOVE_COMMENT, RATING } from "../utils.js";
+import { render, DATA_CHANGE, DATA_CHANGE_TYPE, DATA_CHANGE_USER_DETAILS, CREATE_COMMENT, REMOVE_COMMENT, RATING, RANK, getRank } from "../utils.js";
 import MainNavController from "./main-nav-controller.js";
 import StatsController from "./stats.js";
 import {cloneDeep} from 'lodash';
@@ -28,11 +28,16 @@ export default class MainPageController {
 
   init(movieData, api) {
     this._movieData = movieData;
+
+    const rank = getRank(this._movieData.length, RANK);
+
     this._api = api;
     const header = this._container.querySelector('.header');
     this._renderSearchForm(header);
-    this._renderProfile(header);
+    this._profile.init(header, rank)
     this._mainNavController.init(this._movieData);
+
+    // если количество фильмов 0, то return в this._homePage
     this._homePage.init(this._movieData, this._api);
     this._activeWindow = this._homePage;
     this.onDataChange = this.onDataChange.bind(this);
@@ -81,12 +86,15 @@ export default class MainPageController {
         this._tmpData = value;
         break;
       case DATA_CHANGE.REMOVE_COMMENT:
-        console.log(this._movieData[this._movieIndex])
         this._tmpData = value;
         break;
     }
     this._onDataChangeMain({typeDataChange: this._dataChangeType, movie: this._movieData[this._movieIndex], value: this._tmpData});
     this._resetTmpData();
+  }
+
+  onError() {
+    this._activeWindow.onError({typeDataChange: this._dataChangeType, movieId: this._movieData[this._movieIndex].id});
   }
 
   update({movie, comments}) {
@@ -137,9 +145,5 @@ export default class MainPageController {
 
   _renderSearchForm(container) {
     render(container, this._search.getElement())
-  }
-
-  _renderProfile(container) {
-    render(container, this._profile.getElement())
   }
 }

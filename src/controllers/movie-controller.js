@@ -13,11 +13,18 @@ export default class MovieController {
     this.onDataChange = this.onDataChange.bind(this);
     this._movie = new MovieCard(this._movieData, this.onDataChange);
     this._onMovieClick = this._onMovieClick.bind(this);
+    this._onChangeView = onChangeView;
   }
 
   init() {
     render(this._container, this._movie.getElement(), Position.BEFOREEND)
     this._initMovieDetails();
+  }
+
+  onError(data) {
+    console.log(data)
+    console.log(this._movieDetails)
+    this._movieDetails.onError(data);
   }
 
   _initMovieDetails() {
@@ -33,11 +40,13 @@ export default class MovieController {
   _onMovieClick() {
     this._api.getComments(this._movieData.id)
       .then((data) => {
+        this._onChangeView();
         this._renderMovieDetails(data);
       });
   }
 
   _renderMovieDetails(commentsData) {
+    document.body.classList.add(`hide-overflow`);
     this._movieDetails = new MovieDetailsController(this._movieData, commentsData, this._unrenderMovieDetails, this.onDataChange);
     this._movieDetails.init(this._mainContainer);
   }
@@ -67,5 +76,11 @@ export default class MovieController {
     document.body.classList.remove(`hide-overflow`);
     this._movieDetails.unrender();
     this._movieDetails = null;
+  }
+
+  setDefaultView() {
+    if (this._movieDetails) {
+      this._unrenderMovieDetails();
+    }
   }
 }

@@ -25,19 +25,29 @@ export default class HomePageController {
     this._mainBoardContainer = null;
     this._resultTitle = new ResultTitle(this._mainContainer);
     this._searchController = null;
+    this._boardList = [];
   }
 
   init(movieData, api) {
     this._api = api;
     this._movieData = movieData;
+
     this._mainBoardData = this._movieData;
 
     this._renderSort(this._mainContainer);
     render(this._mainContainer, this._container.getElement(), Position.BEFOREEND);
 
-    this._mainBoardContainer = new MovieList(BOARDS_LIST.ALL).getElement();
-    render(this._container.getElement(), this._mainBoardContainer)
+    this._mainBoardContainer = (this._movieData.length !== 0) ?
+      new MovieList(BOARDS_LIST.ALL).getElement() :
+      new MovieList(BOARDS_LIST.NO_MOVIE, false).getElement();
+
+    render(this._container.getElement(), this._mainBoardContainer);
+
+    if(this._movieData.length === 0) {
+      return;
+    }
     this._mainBoard = new MovieBoardMore(this._mainBoardData, this._api, this._mainBoardContainer, this.onDataChange);
+    this._boardList.push(this._mainBoard);
     this._mainBoard.init();
 
     this._initTopRatedMovie();
@@ -54,6 +64,7 @@ export default class HomePageController {
       const container = new MovieList(BOARDS_LIST.TOP_RATED).getElement();
       render(this._container.getElement(), container);
       this._topRated = new MovieBoard(topRatedMovie, this._api, container, this.onDataChange);
+      this._boardList.push(this._topRated);
       this._topRated.init();
     }
   }
@@ -67,6 +78,7 @@ export default class HomePageController {
     render(this._container.getElement(), container);
 
     this._mostCommented = new MovieBoard(this._getMostCommentedMovie(this._movieData), this._api, container, this.onDataChange);
+    this._boardList.push(this._mostCommented);
     this._mostCommented.init();
     }
   }
@@ -100,7 +112,6 @@ export default class HomePageController {
   }
 
   _updateData({typeDataChange, movieId, value}) {
-    console.log(value)
     const index = this._movieData.findIndex((i) => i.id === movieId);
     if(typeDataChange === REMOVE_COMMENT) {
       this._movieData[index].comments = value.movie;
@@ -111,13 +122,18 @@ export default class HomePageController {
     }
   }
 
+  onError(data) {
+    this._boardList.forEach((board) => board.onError(data));
+  }
+
   //обновление данных с сервера
   update({typeDataChange, movieId, value}) {
 
     this._updateData({typeDataChange, movieId, value});
-    this._mainBoard.updateMovie({typeDataChange, movieId, value});
-    this._topRated.updateMovie({typeDataChange, movieId, value});
-    this._mostCommented.updateMovie({typeDataChange, movieId, value});
+    this._boardList.forEach((board) => board.updateMovie({typeDataChange, movieId, value}))
+    // this._mainBoard.updateMovie({typeDataChange, movieId, value});
+    // this._topRated.updateMovie({typeDataChange, movieId, value});
+    // this._mostCommented.updateMovie({typeDataChange, movieId, value});
 
     switch(typeDataChange) {
       case REMOVE_COMMENT:
@@ -158,8 +174,12 @@ export default class HomePageController {
 
   home() {
     showElement(this._container.getElement())
-    this._searchController = null;
-    this._resultTitle.hide()
+    // это надо будет править
+    if(this._searchController) {
+      this._searchController.remove();
+      this._searchController = null;
+    }
+    //
     this._sort.show();
     this._topRated.show();
     this._mostCommented.show();

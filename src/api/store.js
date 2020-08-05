@@ -4,13 +4,18 @@ export default class Store {
     this._storage = storage;
   }
 
-  setItem({key, item, dataType}) {
+  setItem({key, item, state, dataType}) {
     const items = this.getAll();
+    if(!items[key]) {
+      items[key] = {}
+    }
+    items[key][`state`] = state;
     switch(dataType) {
       case `all`:
         items[key] = item;
         break;
       case 'movie':
+
         items[key]['movie'] = item;
         break;
       case 'comments':

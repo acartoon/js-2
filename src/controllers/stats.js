@@ -1,5 +1,5 @@
-import StatsComponent from "../components/stats";
-import { render, showElement, hideElement, getCountFilms, STATS_PARAMS, STATS_TYPE_FILTER, getRank, RANK } from "../utils";
+import StatsRankComponent from "../components/stats-rank-component";
+import { render, showElement, hideElement, statsParam, getRank, rank } from "../utils";
 import moment from 'moment';
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
@@ -11,7 +11,7 @@ import ChartWrapComponent from "../components/chart-wrap";
 export default class StatsController {
   constructor(container) {
     this._container = container;
-    this._stats = new StatsComponent(this._container);
+    this._statsRank = new StatsRankComponent(this._container);
     this._onFilterBtnClick = this._onFilterBtnClick.bind(this);
     this._filter = new StatsFilterComponent(this._container, this._onFilterBtnClick);
     this._list = new StatsListComponent(this._container);
@@ -20,18 +20,20 @@ export default class StatsController {
     this._init();
     this._commentsData = [];
     this._movieData = [];
+    this._noData = `&ndash;`;
   }
 
+  // отрисовать блоки со статистикой
   _init() {
-    render(this._container, this._stats.getElement());
-    render(this._stats.getElement(), this._filter.getElement());
-    render(this._stats.getElement(), this._list.getElement());
-    render(this._stats.getElement(), this._chartWrap.getElement());
+    render(this._container, this._statsRank.getElement());
+    render(this._statsRank.getElement(), this._filter.getElement());
+    render(this._statsRank.getElement(), this._list.getElement());
+    render(this._statsRank.getElement(), this._chartWrap.getElement());
 
-    this.hide()
+    this.hide();
   }
 
-
+  // обработчик клика на фильтры
   _onFilterBtnClick(filter) {
     const filterType = {
       all: this._movieData,
@@ -39,48 +41,50 @@ export default class StatsController {
       week: this._movieData.filter((movie) => moment(movie.user_details.watching_date).isSame(moment(), 'week')),
       month: this._movieData.filter((movie) => moment(movie.user_details.watching_date).isSame(moment(), 'month')),
       year: this._movieData.filter((movie) => moment(movie.user_details.watching_date).isSame(moment(), 'year')),
-
     };
+
     this._destroyChart();
     this._initStats(filterType[filter]);
-  }
+  };
 
+  // отрисовка статистики
   _initStats(movieData) {
     if(movieData.length === 0) {
-      this._list.getValue(0, 0, `&ndash;`)
+      this._list.getValue(0, 0, this._noData);
       return;
     }
+    const container = this._chartWrap.getElement().querySelector(`.statistic__chart`);
 
     const duration = this._getDurationWachedMovie(movieData);
     const movieGenre = this._getGenresMovie(movieData);
-
     const countMovie = movieData.length;
     const topGenre = Object.entries(movieGenre).sort((a, b) => b[1] - a[1])[0][0];
 
-    this._list.getValue(countMovie, duration, topGenre)
-
-    const container = this._chartWrap.getElement().querySelector(`.statistic__chart`);
-    container.height = STATS_PARAMS.BAR_HEIGHT * Object.keys(movieGenre).length;
+    this._list.getValue(countMovie, duration, topGenre);
+    container.height = statsParam.BAR_HEIGHT * Object.keys(movieGenre).length;
     this._renderChart(container, movieGenre);
-  }
+  };
 
+  // отрисовать статистику
   show(movieData, commentsData) {
     this._movieData = movieData.filter((movie) => movie.user_details.already_watched === true);
     this._commentsData = commentsData;
 
-    this._show();
-    const rank = getRank(movieData.length, RANK);
-    this._stats.init(rank)
+    const userRank = getRank(movieData.length, rank);
+    this._statsRank.init(userRank);
     this._initStats(this._movieData);
-  }
+    this._show();
+  };
 
+  // получить продолжительность фильмов
   _getDurationWachedMovie(moveiData) {
     return moveiData.reduce((result, movie) => {
       result += movie.film_info.runtime;
       return result;
     }, 0);
-  }
+  };
 
+    // получить жанры
   _getGenresMovie(movieData) {
      return movieData.reduce((res, movie) => {
       movie.film_info.genre.forEach(genre => {
@@ -89,24 +93,25 @@ export default class StatsController {
       });
       return res;
     }, {});
-  }
+  };
 
+  // настройки статистики
   _getChartOptions() {
     return {
       plugins: {
         datalabels: {
-          color: STATS_PARAMS.LABEL_COLOR,
-          fontSize: STATS_PARAMS.LABEL_FONT_SIZE,
-          anchor: STATS_PARAMS.LABEL_ANCHOR,
-          align: STATS_PARAMS.LABEL_ALIGNT,
-          offset: STATS_PARAMS.LABEL_OFFSET,
+          color: statsParam.LABEL_COLOR,
+          fontSize: statsParam.LABEL_FONT_SIZE,
+          anchor: statsParam.LABEL_ANCHOR,
+          align: statsParam.LABEL_ALIGNT,
+          offset: statsParam.LABEL_OFFSET,
         }
       },
       scales: {
         xAxes: [{
           display: false,
           ticks: {
-            suggestedMin: STATS_PARAMS.MIN_X_LIMIT,
+            suggestedMin: statsParam.MIN_X_LIMIT,
           }
         }],
         yAxes: [{
@@ -115,9 +120,9 @@ export default class StatsController {
             drawBorder: false,
           },
           ticks: {
-            fontColor: STATS_PARAMS.LABEL_COLOR,
-            fontSize: STATS_PARAMS.LABEL_FONT_SIZE,
-            padding: STATS_PARAMS.LABEL_PADDING,
+            fontColor: statsParam.LABEL_COLOR,
+            fontSize: statsParam.LABEL_FONT_SIZE,
+            padding: statsParam.LABEL_PADDING,
           }
         }]
       },
@@ -130,27 +135,30 @@ export default class StatsController {
     }
   };
 
+  // получить данные о фильмах
   _getChartData(movieGenre) {
     return {
       labels: Object.keys(movieGenre),
       datasets: [{
         data: Object.values(movieGenre),
-        backgroundColor: STATS_PARAMS.GENRE_COLOR,
+        backgroundColor: statsParam.GENRE_COLOR,
 
-      }]
+      }],
     };
-  }
+  };
 
+  // очистить
   _destroyChart() {
     if (this._chart !== null) {
       this._chart.destroy();
       this._chart = null;
     }
-  }
+  };
 
+  // отрисовать статистику
   _renderChart(container, movieGenre) {
     this._chart = new Chart(container, {
-      type: STATS_PARAMS.CHART_TYPE,
+      type: statsParam.CHART_TYPE,
       data: this._getChartData(movieGenre),
       responsive: true,
       maintainAspectRatio: false,
@@ -158,16 +166,17 @@ export default class StatsController {
       plugins: [ChartDataLabels],
       options: this._getChartOptions(),
     });
-  }
+  };
 
-
+  // показать окно статистики
   _show() {
-    showElement(this._stats.getElement())
-  }
+    showElement(this._statsRank.getElement())
+  };
 
+  // скрыть окно статистики
   hide() {
     this._filter.default();
     this._destroyChart();
-    hideElement(this._stats.getElement())
-  }
+    hideElement(this._statsRank.getElement())
+  };
 }

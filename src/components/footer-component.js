@@ -7,12 +7,12 @@ export default class FooterComponent extends AbstractComponent {
     this._container = container;
   }
 
+  getTemplate() {
+    return `<p>${this._movieCount} movies inside</p>`;
+  }
+
   init(movieCount) {
     this._movieCount = movieCount;
     render(this._container, this.getElement());
-  }
-
-  getTemplate() {
-    return `<p>${this._movieCount} movies inside</p>`;
   }
 }

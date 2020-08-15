@@ -1,10 +1,8 @@
-// import {movie, comments} from './data.js';
 import MainController from './controllers/main-controller.js';
 import API from './api/api.js';
-import { CREATE_COMMENT, REMOVE_COMMENT, DATA_CHANGE_USER_DETAILS, RATING } from './utils.js';
+import {typeDataChange} from './utils.js';
 import Store from "./api/store";
 import Provider from './api/provider.js';
-import TitleComponent from './components/title-component.js';
 import FooterComponent from './components/footer-component.js';
 
 
@@ -22,13 +20,13 @@ const footer = document.querySelector(`.footer__statistics`);
 const footerStatistics = new FooterComponent(footer);
 
 
-const mainController = new MainController(bodyContainer, onDataChange);
+// const mainController = new MainController(bodyContainer, onDataChange);
+// запуск меню, фильтров, статуса пользователя
 // mainController.init();
 
 // loading
-const title = new TitleComponent(main);
-title.init();
-debugger;
+// const title = new TitleComponent(main);
+// title.init();
 
 window.addEventListener(`offline`, () => {
   document.title = `${document.title}[OFFLINE]`;
@@ -43,11 +41,10 @@ const onWindowOnline = () => {
   provider.sync()
 }
 
-const onDataChange = (({typeDataChange, movie, value}) => {
-
-  switch (typeDataChange) {
-    case CREATE_COMMENT:
-      provider.createComment(movie.id, value)
+const onDataChange = (({typeData, movie, comment}) => {
+  switch (typeData) {
+    case typeDataChange.CREATE_COMMENT:
+      provider.createComment(movie.id, comment)
       .then(({movie, comments}) => {
         mainController.update({movie, comments})
       })
@@ -55,43 +52,46 @@ const onDataChange = (({typeDataChange, movie, value}) => {
         mainController.onError();
       })
       break;
-    case REMOVE_COMMENT:
-      provider.removeComment(value, movie).
-        then(({movie, comments}) => {
+    case typeDataChange.REMOVE_COMMENT:
+      provider.removeComment(comment, movie)
+        .then(({movie, comments}) => {
           mainController.update({movie, comments});
         });
       break;
-    case DATA_CHANGE_USER_DETAILS:
-      provider.updateMovie(movie.id, value)
+    case typeDataChange.USER_DETAILS:
+      provider.updateMovie(movie.id, movie)
       .then((movie) => {
           mainController.update({movie: movie});
         })
-        .catch(() => {
+        .catch((movie) => {
           mainController.onError();
         });
         break;
-        case RATING:
-          provider.updateMovie(movie.id, value).
-          then((movie) => {
-            mainController.update({movie: movie});
-          })
-          .catch(() => {
-            mainController.onError();
-          });
-      break;
-
+    // case typeDataChange.RATING:
+    //   provider.updateMovie(movie.id, value)
+    //   .then((movie) => {
+    //     mainController.update({movie: movie});
+    //   })
+    //   .catch(() => {
+    //     mainController.onError();
+    //   });
+    //   break;
     }
   });
 
 
+const mainController = new MainController(bodyContainer, onDataChange);
+mainController.init();
 
 provider.getMovie().then((data) => {
-  title.remove();
-
   // запуск приложения с данными
-  mainController.init(data, provider);
+  mainController.load(data, provider);
+
+  // загрузка поиска, фильмов
+  // mainController.init(load, provider);
   footerStatistics.init(data.length);
 });
+
 window.addEventListener(`load`, () => {
   navigator.serviceWorker.register(`./sw.js`)
   .then(function(reg) {

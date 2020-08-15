@@ -1,4 +1,5 @@
 import AbstractComponent from './abstract-component.js';
+import { render } from '../utils.js';
 
 export default class Search extends AbstractComponent {
   constructor(initSearch, resetSearch, MIN_LENGTH_VALUE) {
@@ -9,7 +10,10 @@ export default class Search extends AbstractComponent {
     this._input = this.getElement().querySelector(`.search__field`);
     this._onSearchFieldInput = this._onSearchFieldInput.bind(this);
     this._init();
+  }
 
+  init(container) {
+    render(container, this.getElement())
   }
 
   _init() {
@@ -20,6 +24,7 @@ export default class Search extends AbstractComponent {
         this._input.addEventListener(`input`, this._onSearchFieldInput);
       }
     });
+
     //закрытие поиска при нажатии на кнопку
     this.getElement().querySelector(`.search__reset`).addEventListener(`click`, this._resetSearch);
   };

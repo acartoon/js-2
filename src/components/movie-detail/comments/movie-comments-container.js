@@ -11,6 +11,7 @@ export default class MovieCommentsContainer extends AbstractComponent {
     const title = this.getElement().querySelector(`.film-details__comments-count`);
     title.innerHTML = this._commentsCount;
   }
+
   getTemplate() {
     return `<section class="film-details__comments-wrap">
     <h3 class="film-details__comments-title">

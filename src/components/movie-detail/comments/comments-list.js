@@ -1,6 +1,5 @@
 import AbstractComponent from '../../abstract-component.js';
 
-
 export default class CommentsList extends AbstractComponent {
 
   getTemplate() {

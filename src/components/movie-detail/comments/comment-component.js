@@ -1,9 +1,8 @@
 import AbstractComponent from '../../abstract-component.js';
 import moment from 'moment';
-import { DATA_CHANGE, unrender } from '../../../utils.js';
+import {unrender, typeDataChange, dateFormat} from '../../../utils.js';
 
 export default class CommentComponent extends AbstractComponent {
-  // constructor(data, onDataChange) {
   constructor({id, comment, author, date, emotion}, onDataChange) {
     super();
     this.id = id;
@@ -16,6 +15,8 @@ export default class CommentComponent extends AbstractComponent {
     this._deleteBtn = this.getElement().querySelector(`.film-details__comment-delete`);
     this._onWindowsOffline = this._onWindowsOffline.bind(this);
     this._onWindowsOnline = this._onWindowsOnline.bind(this);
+    this._minHours = 1;
+    this._maxHours = 24;
 
     this._init();
   }
@@ -40,15 +41,6 @@ export default class CommentComponent extends AbstractComponent {
     return window.navigator.onLine;
   }
 
-  _init() {
-    this._onClick();
-    window.addEventListener(`offline`, this._onWindowsOffline);
-    // this._onDate();
-
-    if(!this._isOnline()) {
-      this._onWindowsOffline();
-    }
-  }
 
   _onDate() {
     let value = ``;
@@ -60,28 +52,26 @@ export default class CommentComponent extends AbstractComponent {
     const days = parseInt(duration.asDays());
 
     if(minutes <= 0) {
-      value = `now`
-    } else if (minutes <= 3) {
-      value = `a minute ago`
-    } else if(hours > 1 && hours < 2 ) {
-      value = `a hour ago`
-    } else if (hours > 2 && hours < 24) {
-      value = `a few hours ago`
-    } else if(days => 1) {
+      value = dateFormat.NOW;
+    } else if (minutes <= this._minHours + 2) {
+      value = dateFormat.MINUTE;
+    } else if(hours > this._minHours && hours < this._minHours + 1 ) {
+      value = dateFormat.HOURE;
+    } else if (hours > this._minHours + 1  && hours < this._maxHours) {
+      value = dateFormat.FEW_HOURS;
+    } else if(days => this._minHours) {
       value = `a ${days} day ago`
     }
-
     return value;
   }
 
 
   _onClick() {
-    // const deleteBtn = this.getElement().querySelector(`.film-details__comment-delete`);
     this._deleteBtn.addEventListener(`click`, (evt) => {
       evt.preventDefault();
       this._deleteBtn.innerHTML = this._titleBtn;
       this._deleteBtn.disabled = true;
-      this._onDataChange({typeDataChange: DATA_CHANGE.REMOVE_COMMENT, value: this});
+      this._onDataChange({typeData: typeDataChange.REMOVE_COMMENT, value: this});
     });
   }
 
@@ -98,4 +88,15 @@ export default class CommentComponent extends AbstractComponent {
     unrender(this.getElement());
     this.removeElement();
   }
+
+
+  _init() {
+    this._onClick();
+    window.addEventListener(`offline`, this._onWindowsOffline);
+
+    if(!this._isOnline()) {
+      this._onWindowsOffline();
+    }
+  }
+
 }

@@ -1,5 +1,5 @@
 import MovieCard from "../components/movie-card";
-import { render, Position, DATA_CHANGE_USER_DETAILS, DATA_CHANGE_COMMENTS, RATING, REMOVE_COMMENT, CREATE_COMMENT} from "../utils";
+import {render, Position, typeDataChange} from "../utils";
 import MovieDetailsController from "./movie-details-controller";
 
 export default class MovieController {
@@ -21,10 +21,21 @@ export default class MovieController {
     this._initMovieDetails();
   }
 
-  onError(data) {
-    console.log(data)
-    console.log(this._movieDetails)
-    this._movieDetails.onError(data);
+  setDefaultView() {
+    if (this._movieDetails) {
+      this._unrenderMovieDetails();
+    }
+  }
+
+  update({typeData, value}) {
+    this._updateData({typeData, value});
+
+    if(typeData !== typeDataChange.RATING) {
+      this._movie.update({typeData, value});
+    }
+    if(this._movieDetails) {
+      this._movieDetails.update({typeData, value});
+    }
   }
 
   _initMovieDetails() {
@@ -32,10 +43,39 @@ export default class MovieController {
       .addEventListener(`click`, this._onMovieClick);
   }
 
-
-  onDataChange({typeDataChange, value}) {
-    this.onDataChangeMain({typeDataChange: typeDataChange, movieId: this._movieData.id, value: value});
+  _renderMovieDetails(commentsData) {
+    document.body.classList.add(`hide-overflow`);
+    this._movieDetails = new MovieDetailsController(this._movieData, commentsData, this._unrenderMovieDetails, this.onDataChange);
+    this._movieDetails.init(this._mainContainer);
   }
+
+  _updateData({typeData, value}) {
+    if(typeData === typeDataChange.REMOVE_COMMENT) {
+      this._movieData.comments = value;
+    } else if (typeData === typeDataChange.CREATE_COMMENT) {
+      this._movieData.comments = value.comments;
+    } else if (typeData === typeDataChange.USER_DETAILS || typeData === typeDataChange.RATING) {
+      this._movieData.user_details = value;
+    }
+  }
+
+
+  _unrenderMovieDetails() {
+    document.body.classList.remove(`hide-overflow`);
+    this._movieDetails.unrender();
+    this._movieDetails = null;
+  }
+
+
+  onDataChange({typeData, value}) {
+    // в boardController
+    this.onDataChangeMain({typeData, movieId: this._movieData.id, value});
+  }
+
+  onError(data) {
+    this._movieDetails.onError(data);
+  }
+
 
   _onMovieClick() {
     this._api.getComments(this._movieData.id)
@@ -45,42 +85,4 @@ export default class MovieController {
       });
   }
 
-  _renderMovieDetails(commentsData) {
-    document.body.classList.add(`hide-overflow`);
-    this._movieDetails = new MovieDetailsController(this._movieData, commentsData, this._unrenderMovieDetails, this.onDataChange);
-    this._movieDetails.init(this._mainContainer);
-  }
-
-  _updateData({typeDataChange, value}) {
-    if(typeDataChange === REMOVE_COMMENT) {
-      this._movieData.comments = value;
-    } else if (typeDataChange === CREATE_COMMENT) {
-      this._movieData.comments = value.comments;
-    } else if (typeDataChange === DATA_CHANGE_USER_DETAILS || typeDataChange === RATING) {
-      this._movieData.user_details = value;
-    }
-  }
-
-  update({typeDataChange, value}) {
-    this._updateData({typeDataChange, value});
-
-    if(typeDataChange !== RATING) {
-      this._movie.update({typeDataChange, value});
-    }
-    if(this._movieDetails) {
-      this._movieDetails.update({typeDataChange, value});
-    }
-  }
-
-  _unrenderMovieDetails() {
-    document.body.classList.remove(`hide-overflow`);
-    this._movieDetails.unrender();
-    this._movieDetails = null;
-  }
-
-  setDefaultView() {
-    if (this._movieDetails) {
-      this._unrenderMovieDetails();
-    }
-  }
 }

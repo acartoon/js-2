@@ -8,16 +8,15 @@ export default class EmojiLabel extends AbstractComponent {
     this._onClick();
   }
 
-  getTemplate() {
-    return `<label class="film-details__emoji-label" for="${this._emotion}">
-        <img src="./images/emoji/${this._emotion}.png" width="30" height="30" alt="${this._emotion}">
-      </label>`;
-  }
-
-
   _onClick() {
     this.getElement().addEventListener(`click`, () => {
       this._onChangeEmotion(this._emotion);
     });
+  }
+
+  getTemplate() {
+    return `<label class="film-details__emoji-label" for="${this._emotion}">
+      <img src="./images/emoji/${this._emotion}.png" width="30" height="30" alt="${this._emotion}">
+      </label>`;
   }
 }

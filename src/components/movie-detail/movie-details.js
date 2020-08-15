@@ -1,13 +1,10 @@
-import {render, KEY_CODE} from '../../utils.js';
 import moment from 'moment';
-import AbstractComponent from '../abstract-component.js';
 import MovieBaseComponent from '../movie-base-component.js';
 
 export default class MovieDetails extends MovieBaseComponent{
   constructor(data) {
     super(data);
   }
-
 
   getTemplate() {
     return `<section class="film-details">

@@ -1,3 +1,5 @@
+import { typeDataStore } from "../utils";
+
 export default class Store {
   constructor({key, storage}) {
     this._storeKey = key;
@@ -11,14 +13,13 @@ export default class Store {
     }
     items[key][`state`] = state;
     switch(dataType) {
-      case `all`:
+      case typeDataStore.ALL:
         items[key] = item;
         break;
-      case 'movie':
-
+      case typeDataStore.MOVIE:
         items[key]['movie'] = item;
         break;
-      case 'comments':
+      case typeDataStore.COMMENTS:
         items[key]['comments'] = item;
         break;
     }

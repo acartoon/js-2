@@ -1,55 +1,18 @@
-import {render, unrender, BTN_CARD_CONTROLS, DATA_CHANGE_USER_DETAILS, DATA_CHANGE_COMMENTS, REMOVE_COMMENT, CREATE_COMMENT} from '../utils.js';
+import {render, cardControls, typeDataChange} from '../utils.js';
 import moment from 'moment';
 import 'moment-duration-format';
 import MovieBaseComponent from './movie-base-component.js';
 import MovieBtnControls from './movie-btn-controls.js';
+import {cloneDeep} from 'lodash';
 
 export default class MovieCard extends MovieBaseComponent {
   constructor(data, onDataChange) {
     super(data);
-    this.onDataChange = onDataChange;
+    this.onDataChange = this.onDataChange.bind(this);
+    this._onDataChangeMain = onDataChange;
     this._movieCommentsCount = null;
-
+    this._tmpData = null;
     this._init();
-  }
-
-  _init() {
-    this._renderBtnControls(this._user_details);
-  }
-
-
-  _updateData({typeDataChange, value}) {
-    if(typeDataChange === DATA_CHANGE_USER_DETAILS) {
-      this._user_details = value
-    } else if(typeDataChange === REMOVE_COMMENT || typeDataChange === CREATE_COMMENT) {
-      this._comments = value;
-    }
-  }
-
-  update({typeDataChange, value}) {
-    this._updateData({typeDataChange, value});
-    if(typeDataChange === DATA_CHANGE_USER_DETAILS) {
-      this._updateBtnControls();
-    } else if(typeDataChange === REMOVE_COMMENT || typeDataChange === CREATE_COMMENT) {
-      this._updateCommentsCount(this._comments.length)
-    }
-  }
-
-  _updateBtnControls() {
-    this.getElement().querySelector(`.film-card__controls`).innerHTML = ``;
-    this._renderBtnControls();
-  }
-
-  _updateCommentsCount(count) {
-    this.getElement().querySelector(`.film-card__comments`).innerHTML = `${count} comments`;
-  }
-
-  _renderBtnControls() {
-    const btnContainer = this.getElement().querySelector(`.film-card__controls`);
-    Object.keys(BTN_CARD_CONTROLS).forEach((key) => {
-      const btn = new MovieBtnControls(BTN_CARD_CONTROLS[key], this._user_details[key], this.onDataChange);
-      render(btnContainer, btn.getElement());
-    });
   }
 
   getTemplate() {
@@ -66,5 +29,74 @@ export default class MovieCard extends MovieBaseComponent {
     <a class="film-card__comments">${this._comments.length} comments</a>
     <form class="film-card__controls"></form>
     </article>`;
+  }
+
+
+  update({typeData, value}) {
+    this._updateMovieData({typeData, value});
+    if(typeData === typeDataChange.USER_DETAILS) {
+      this._updateBtnControls();
+    } else if(typeData === typeDataChange.REMOVE_COMMENT || typeData === typeDataChange.CREATE_COMMENT) {
+      this._updateCommentsCount(this._comments.length)
+    }
+  }
+
+  _init() {
+    this._renderBtnControls(this._user_details);
+  }
+
+  _initTmpData() {
+    this._tmpData = cloneDeep(this._user_details);
+  }
+
+  _resetTmpData() {
+    this._tmpData = null;
+  }
+
+
+  _updateMovieData({typeData, value}) {
+    if(typeData === typeDataChange.USER_DETAILS) {
+      this._user_details = value;
+    } else if(typeData === typeDataChange.REMOVE_COMMENT || typeData === typeDataChange.CREATE_COMMENT) {
+      this._comments = value.movie;
+    }
+  }
+
+
+  _updateBtnControls() {
+    this.getElement().querySelector(`.film-card__controls`).innerHTML = ``;
+    this._renderBtnControls();
+  }
+
+  _updateCommentsCount(count) {
+    this.getElement().querySelector(`.film-card__comments`).innerHTML = `${count} comments`;
+  }
+
+  _renderBtnControls() {
+    const btnContainer = this.getElement().querySelector(`.film-card__controls`);
+    Object.keys(cardControls).forEach((key) => {
+      const btn = new MovieBtnControls(cardControls[key], this._user_details[key], this.onDataChange);
+      render(btnContainer, btn.getElement());
+    });
+  }
+
+  onDataChange(typeData) {
+    this._initTmpData();
+
+    // поменять когда исправлю тип данных
+    switch(typeData) {
+      case typeDataChange.WATCHLIST :
+        this._tmpData.watchlist = !this._tmpData.watchlist;
+        break;
+      case typeDataChange.ALREADY_WATCHED :
+        this._tmpData.already_watched = !this._tmpData.already_watched;
+        break;
+      case typeDataChange.FAVORITE :
+        this._tmpData.favorite = !this._tmpData.favorite;
+        break;
+    }
+
+    this._onDataChangeMain({typeData: typeDataChange.USER_DETAILS, value: this._tmpData})
+    this._resetTmpData();
   }
 }

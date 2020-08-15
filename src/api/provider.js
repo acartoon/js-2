@@ -1,5 +1,5 @@
 import CommentsController from "../controllers/comments-controller";
-import { CHANGE_STATES } from "../utils";
+import { stateStore, typeDataStore } from "../utils";
 
 export default class  Provider {
   constructor({api, store}) {
@@ -16,7 +16,7 @@ export default class  Provider {
       return this._api.getMovie()
       .then((movieData) => {
         movieData.map((movie) => {
-          this._store.setItem({key: movie.id, item: movie, state: CHANGE_STATES.INTINIAL, dataType: `movie`})
+          this._store.setItem({key: movie.id, item: movie, state: stateStore.INTINIAL, dataType: typeDataStore.MOVIE})
           this.getComment(movie);
       });
         return Promise.resolve(movieData);
@@ -40,7 +40,7 @@ export default class  Provider {
   getComment(movie) {
     return this._api.getComments(movie.id)
     .then((comments) => {
-      this._store.setItem({key: movie.id, item: comments, state: CHANGE_STATES.INTINIAL, dataType: `comments`});
+      this._store.setItem({key: movie.id, item: comments, state: stateStore.INTINIAL, dataType: typeDataStore.COMMENTS});
     });
   }
 
@@ -49,50 +49,48 @@ export default class  Provider {
     if(this._isOnline()) {
       return this._api.updateMovie(id, data)
       .then((movieData) => {
-        this._store.setItem({key: movieData.id, item: movieData, state: CHANGE_STATES.CHANGE, dataType: `movie`});
+        this._store.setItem({key: movieData.id, item: movieData, state: stateStore.CHANGE, dataType: typeDataStore.MOVIE});
         return Promise.resolve(movieData);
       });
     } else {
-      this._store.setItem({key: data.id, item: data, state: CHANGE_STATES.CHANGE, dataType: `movie`});
-      console.log(data)
+      this._store.setItem({key: data.id, item: data, state: stateStore.CHANGE, dataType: typeDataStore.MOVIE});
       return Promise.resolve(data);
     }
   }
 
-
+  // api.createComment возвращает массив фильм и список комментариев
   createComment(id, array) {
     return this._api.createComment(id, array)
     .then(({movie, comments}) => {
-      this._store.setItem({key: movie.id, item: {movie: movie, comments: comments}, state: CHANGE_STATES.CHANGE, dataType: `all`})
+      this._store.setItem({key: movie.id, item: {movie: movie, comments: comments}, state: stateStore.CHANGE, dataType: typeDataStore.ALL});
       return Promise.resolve({movie, comments});
-    })
+    });
   }
 
+  // api.removeComment возвращает только статус 200
   removeComment(id, movie) {
     return this._api.removeComment(id)
       .then(() => {
         return this.updateMovie(movie.id, movie)
           .then((data) => {
-            console.log(data)
             return this._api.getComments(data.id)
             .then((comments) => {
-              this._store.setItem({key: data.id, item: {movie: data, comments: comments}, state: CHANGE_STATES.CHANGE, dataType: `all`});
+              this._store.setItem({key: data.id, item: {movie: data, comments: comments}, state: stateStore.CHANGE, dataType: typeDataStore.ALL});
               return Promise.resolve({movie: data, comments})
             });
           });
       });
   }
 
-
   _getStore(movie, comments) {
-    this._store.setItem({key: movie.id, item: {movie: movie, comments: comments}, state: CHANGE_STATES.CHANGE, dataType: `all`})
+    this._store.setItem({key: movie.id, item: {movie: movie, comments: comments}, state: stateStore.CHANGE, dataType: typeDataStore.ALL})
   }
 
   getComments(id) {
     if (this._isOnline()) {
       return this._api.getComments(id)
       .then((comments) => {
-        this._store.setItem({key: id, item: comments, dataType: `comments`})
+        this._store.setItem({key: id, item: comments, dataType: typeDataStore.COMMENTS})
         return Promise.resolve(comments);
       });
     } else {

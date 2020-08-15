@@ -5,12 +5,15 @@ export default class Profile extends AbstractComponent {
   constructor() {
     super();
     this._rank = null;
-
   }
 
   init(container, rank) {
     this._rank = rank;
-    render(container, this.getElement())
+    render(container, this.getElement());
+  }
+
+  update(rank) {
+    // this.getElement().q
   }
 
   getTemplate() {

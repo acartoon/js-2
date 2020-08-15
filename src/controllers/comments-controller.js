@@ -1,4 +1,4 @@
-import {render, unrender, KEY_CODE, DATA_CHANGE, EMOJIS, getRandomString, Position, REMOVE_COMMENT, CREATE_COMMENT} from '../utils.js';
+import {render, unrender, keyCode, emoji, Position, typeDataChange} from '../utils.js';
 import MovieCommentsContainer from '../components/movie-detail/comments/movie-comments-container.js';
 import CommentsList from '../components/movie-detail/comments/comments-list.js';
 import CommentComponent from '../components/movie-detail/comments/comment-component.js';
@@ -10,11 +10,10 @@ export default class CommentsController{
     this._movieCommentsContainer = new MovieCommentsContainer(this._commentsData.length);
     this._commentsList = new CommentsList();
     this._onDocumentKeyDown = this._onDocumentKeyDown.bind(this);
-    this._newComment = new NewComment(this.onTextareaInput.bind(this));
+    this._newComment = new NewComment(this.onTextareaInput.bind(this), this.getEmotion);
     this._onDataChangeMain = onDataChange;
     this.onDataChange = this.onDataChange.bind(this);
     this._selectedEmotion = null;
-    // this.onTextareaInput = this.onTextareaInput;
   }
 
   init(container) {
@@ -26,40 +25,40 @@ export default class CommentsController{
     this._renderNewComments();
   }
 
-  onDataChange({typeDataChange, value}) {
+  onDataChange({typeData, value}) {
     this._activeComment = value;
-    this._onDataChangeMain({typeDataChange: typeDataChange, value: this._activeComment.id})
+    this._onDataChangeMain({typeData: typeData, value: this._activeComment.id})
   }
 
   _onDocumentKeyDown(e) {
-    if(e.key === KEY_CODE.ENTER && (e.ctrlKey || e.metaKey)) {
+    if(e.key === keyCode.ENTER && (e.ctrlKey || e.metaKey)) {
       const comment = _.escape(e.target.value);
+      this._selectedEmotion = this._newComment.getEmotion();
       const message = this._createNewMessage(this._selectedEmotion, comment);
-      this._newComment.resetError();
-      this._onDataChangeMain({typeDataChange: DATA_CHANGE.CREATE_COMMENT, value: message});
+      this._newComment.removeError();
+      this._onDataChangeMain({typeData: typeDataChange.CREATE_COMMENT, value: message});
     }
   }
 
-onError() {
-  this._newComment.onError();
-
-}
-
-  onTextareaInput(selectedEmotion) {
-    this._selectedEmotion = selectedEmotion;
-    document.addEventListener(`keydown`, this._onDocumentKeyDown)
+  onError() {
+    this._newComment.showError();
   }
 
-  update({typeDataChange, value}) {
+  onTextareaInput() {
+    document.addEventListener(`keydown`, this._onDocumentKeyDown);
+  }
+
+  update({typeData, value}) {
     this._commentsData = value;
     this._movieCommentsContainer.update(this._commentsData.length);
 
-    switch (typeDataChange) {
-      case CREATE_COMMENT:
+    switch (typeData) {
+      case typeDataChange.CREATE_COMMENT:
         const commentComponent = new CommentComponent(this._commentsData[this._commentsData.length-1], this.onDataChange);
         render(this._commentsList.getElement(), commentComponent.getElement(), Position.BEFOREEND);
+        this._newComment.clear();
         break;
-      case REMOVE_COMMENT:
+      case typeDataChange.REMOVE_COMMENT:
         this._activeComment.remove();
         break;
     }
@@ -69,11 +68,12 @@ onError() {
     return {
       comment,
       date: new Date(),
-      emotion: emotion ? emotion : EMOJIS.SMILE,
+      emotion: emotion ? emotion : emoji.SMILE,
     }
   }
 
   unrender() {
+    document.removeEventListener(`keydown`, this._onDocumentKeyDown);
     this._newComment.removeListeners();
     unrender(this._movieCommentsContainer.getElement());
     this._movieCommentsContainer.removeElement();

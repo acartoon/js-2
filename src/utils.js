@@ -1,45 +1,49 @@
 import moment from "moment";
 
-export const DATA_CHANGE_COMMENTS = `comments`;
-export const CREATE_COMMENT = `create`;
-export const REMOVE_COMMENT = `remove`;
-export const DATA_CHANGE_USER_DETAILS = `user_details`;
-export const RATING = `RATING`;
 export const USER_RATING_COUNT = 9;
-
-
-export const STATS_TYPE_FILTER = {
-  all: `all`,
-  today: `today`,
-  week: `week`,
-  month: `month`,
-  year: `year`,
-
-}
-
 export const ANIMATION_TIMEOUT = 600;
 
-export const CHANGE_STATES = {
-  INTINIAL: `intinial`,
-  CHANGE: `change`
-}
+export const dateFormat = {
+  NOW: `now`,
+  MINUTE: `a minute ago`,
+  HOURE: `a hour ago`,
+  FEW_HOURS: `a few hours ago`,
+};
 
-// export const TYPE_CHANGE_DATA = {
-//   CREATE_COMMENT: `create`,
-//   REMOVE_COMMENT: `remove`,
-//   UPDATE_MOVIE: `remove`,
-// }
+export const typeDataChange = {
+  USER_DETAILS: `userDetails`,
+  CREATE_COMMENT: `create`,
+  REMOVE_COMMENT: `remove`,
+  ALREADY_WATCHED: `watched`,
+  WATCHLIST: `watchlist`,
+  FAVORITE: `favorite`,
+};
+
+export const stateStore = {
+  INTINIAL: `intinial`,
+  CHANGE: `change`,
+};
+
+export const typeDataStore = {
+  ALL: `all`,
+  MOVIE: `movie`,
+  COMMENTS: `comments`,
+};
 
 export const Method = {
   GET: `GET`,
   POST: `POST`,
   PUT: `PUT`,
-  DELETE: `DELETE`
+  DELETE: `DELETE`,
 };
 
+export const rank = {
+  NOTICE: `novice`,
+  FAN: `fan`,
+  BUFF: `movie buff`,
+};
 
-
-export const STATS_PARAMS = {
+export const statsParam = {
   CHART_TYPE: `horizontalBar`,
   MIN_X_LIMIT: 0,
   LABEL_FONT_SIZE: 20,
@@ -50,18 +54,29 @@ export const STATS_PARAMS = {
   LABEL_ANCHOR: `start`,
   GENRE_COLOR: `#FBE44D`,
   BAR_HEIGHT: 50,
-}
+};
 
 
-export const KEY_CODE = {
+export const keyCode = {
   ESC: `Escape`,
   CONTROL: `Control`,
   ENTER: `Enter`,
-}
+};
 
 export const Position = {
   AFTERBEGIN: `afterbegin`,
   BEFOREEND: `beforeend`,
+};
+
+export const windows = {
+  MAIN: `main`,
+  SEARCH: `search`,
+  STATS: `stats`,
+};
+
+export const filterFlag = {
+  reset: `reset`,
+  save: `save`,
 };
 
 export const render = (container, element, place = `beforeend`) => {
@@ -72,71 +87,45 @@ export const render = (container, element, place = `beforeend`) => {
   return places[place];
 };
 
-export const DATA_CHANGE_TYPE = {
-  RATING: RATING,
-  WATCHLIST: DATA_CHANGE_USER_DETAILS,
-  FAVORITE: DATA_CHANGE_USER_DETAILS,
-  ALREADY_WATCHED: DATA_CHANGE_USER_DETAILS,
-  CREATE_COMMENT: CREATE_COMMENT,
-  REMOVE_COMMENT: REMOVE_COMMENT,
-}
 
-export const DATA_CHANGE = {
-  RATING: `RATING`,
-  WATCHLIST: `WATCHLIST`,
-  FAVORITE: `FAVORITE`,
-  ALREADY_WATCHED: `ALREADY_WATCHED`,
-  CREATE_COMMENT : `CREATE_COMMENT`,
-  REMOVE_COMMENT : `REMOVE_COMMENT`,
-}
+export const PopupBtnControl = {
+  watchlist: {name: `watchlist`, label: `Add to watchlist`, dataType:  typeDataChange.WATCHLIST},
+  watched: {name: `watched`, label: `Already watched`, dataType:  typeDataChange.ALREADY_WATCHED},
+  favorite: {name: `favorite`, label: `Add to favorites`, dataType:  typeDataChange.FAVORITE},
+};
 
+// тут надо править
+export const cardControls = {
+  watchlist: {classBtn: `add-to-watchlist`, title: `Add to watchlist`, dataType: typeDataChange.WATCHLIST},
+  already_watched: {classBtn: `mark-as-watched`, title: `Mark as watched`, dataType: typeDataChange.ALREADY_WATCHED},
+  favorite: {classBtn: `favorite`, title: `Mark as favorite`, dataType: typeDataChange.FAVORITE},
+};
 
-export const MOVIE_DETAIL_BTN_CONTROLS = {
-  WATCHLIST: {name: `watchlist`, label: `Add to watchlist`, dataType:  DATA_CHANGE.WATCHLIST},
-  ALREADY_WATCHED: {name: `watched`, label: `Already watched`, dataType:  DATA_CHANGE.ALREADY_WATCHED},
-  FAVORITE: {name: `favorite`, label: `Add to favorites`, dataType:  DATA_CHANGE.FAVORITE},
-}
-
-export const windows = {
-  MAIN: `main`,
-  SEARCH: `search`,
-  STATS: `stats`,
-}
-
-export const filterFlag = {
-  reset: `reset`,
-  save: `save`,
-}
-
-export const EMOJIS = {
+export const emoji = {
   SMILE: `smile`,
   SLEPPING: `sleeping`,
   PUKE: `puke`,
   ANGRY: `angry`,
-}
+};
 
 // меню
-export const FILTER_TYPE = {
+export const filter = {
+// export const FILTER_TYPE = {
   ALL: {title: `All movies`, anchor: `all`, active: true},
   WATCHLIST: {title: `Watchlist`, anchor: `watchlist`, active: false},
   HISTORY: {title: `History`, anchor: `history`, active: false},
   FAVORITES: {title: `Favorites`, anchor: `favorites`, active: false},
   STATS: {title: `Stats`, anchor: `stats`, active: false},
-}
+};
 
 //главная страница
-export const BOARDS_LIST = {
+export const boardList = {
   ALL: {isExtra: false, title: `All movies. Upcoming`},
   TOP_RATED: {isExtra: true, title: `Top rated`},
   MOST_COMMENTED: {isExtra: true,  title: `Most commented`},
   NO_MOVIE: {isExtra: false,  title: `There are no movies in our database`},
-}
-
-export const BTN_CARD_CONTROLS = {
-  watchlist: {classBtn: `add-to-watchlist`, title: `Add to watchlist`, dataType: DATA_CHANGE.WATCHLIST},
-  already_watched: {classBtn: `mark-as-watched`, title: `Mark as watched`, dataType: DATA_CHANGE.ALREADY_WATCHED},
-  favorite: {classBtn: `favorite`, title: `Mark as favorite`, dataType: DATA_CHANGE.FAVORITE},
-}
+  LOADING: {isExtra: false,  title: `Loading...`},
+};
 
 export const namesPeople = new Set([
   `Alfred Hitchcock`,
@@ -160,7 +149,7 @@ export function getRandomString(length) {
     result += characters.charAt(Math.floor(Math.random() * characters.length));
   }
   return result;
-}
+};
 
 export const getRandomTime = () => getRandomInteger(180, 65);
 
@@ -175,14 +164,14 @@ export const getComments = (commentsId, commentsData) => {
     const comment = commentsData.filter((comment) => comment.id === commentId);
     return [...array, ...comment]
   }, [])
-}
+};
 
 export function getRandomDate() {
   let randomYear = getRandomInteger(1930, 1990);
   let randomMonth = getRandomInteger(1, 12);
   let randomDate = getRandomInteger(1, 30);
   return new Date(randomYear, randomMonth, randomDate);
-}
+};
 
 // количество фильтров согласно ключу
 export const getCountFilms = (movieData, key) => {
@@ -203,7 +192,7 @@ export const generateComments = (movieData, getComment) => {
 
 export function renderElement(container, template, type = `beforeend`) {
   container.insertAdjacentHTML(type, template);
-}
+};
 
 export const createElement = (template) => {
   const newElement = document.createElement(`div`);
@@ -218,18 +207,9 @@ export const unrender = (element) => {
   }
 };
 
-export const Time = {
-  'all-time': `all-time`,
-  today : moment(),
-  week : moment().subtract(7, 'days'),
-  month : moment().subtract(1, 'month'),
-  year: moment().subtract(1, 'year'),
-}
-
 export const getMovie = (movieData, time) => {
   return movieData.filter((movie) => moment(movie.user_details.watching_date).isAfter(time));
 };
-
 
 export const durationMovie = (movieData) => {
   const duration = movieData.reduce((count, movie) => {
@@ -241,7 +221,7 @@ export const durationMovie = (movieData) => {
     h: Math.floor(duration / 60),
     m: duration % 60
   }
-}
+};
 
 export const hideElement = (element) => {
   element.classList.add(`visually-hidden`)
@@ -249,7 +229,7 @@ export const hideElement = (element) => {
 
 export const showElement = (element) => {
   element.classList.remove(`visually-hidden`)
-}
+};
 
 
 export const checkStatus = (response) => {
@@ -264,13 +244,7 @@ export const toJSON = (response) => {
   return response.json();
 };
 
-export const RANK = {
-  novice: `novice`,
-  fan: `fan`,
-  buff: `movie buff`,
+export const getRank = (movieLength, rank) => {
+  return movieLength < 10 ? rank.NOTICE :
+  movieLength > 20 ? rank.BUFF : rank.FAN;
 };
-
-export const getRank = (movieLength, RANK) => {
-  return movieLength < 10 ? RANK.novice :
-  movieLength > 20 ? RANK.baff : RANK.fan;
-}

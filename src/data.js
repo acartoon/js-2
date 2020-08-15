@@ -5,7 +5,7 @@ import {
   getRandomInteger,
   getRandomTime,
   generateComments,
-  EMOJIS,
+  emoji,
   getRandomString,
   namesPeople
 } from './utils.js';
@@ -76,9 +76,9 @@ const getMovie = () => {
 
 
 const creareRandomEmojis = () => {
-  const keys = Object.keys(EMOJIS);
+  const keys = Object.keys(emoji);
   const ramdomKey = keys[getRandomInteger(0, keys.length)];
-  return EMOJIS[ramdomKey];
+  return emoji[ramdomKey];
 };
 
 const getComment = () => ({

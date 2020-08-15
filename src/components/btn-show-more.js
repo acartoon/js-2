@@ -4,7 +4,6 @@ export default class BtnShowMore extends AbstractComponent {
   constructor(onBtnClick) {
     super();
     this._onBtnClick = onBtnClick;
-
     this._onClick();
   }
   getTemplate() {

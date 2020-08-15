@@ -23,11 +23,11 @@ export default class NavigationElement extends AbstractComponent {
     this.getElement().addEventListener('click', (evt) => {
       evt.preventDefault();
       onAction(this._anchor, this);
-      this.onActive();
+      this.select();
     });
   }
 
-  onActive() {
+  select() {
     this.getElement().classList.add(this._activeClass);
   }
 

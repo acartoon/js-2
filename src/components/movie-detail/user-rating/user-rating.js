@@ -1,8 +1,7 @@
 import AbstractComponent from '../../abstract-component.js';
 import RatingInput from './rating-input.js';
 import RatingLabel from './rating-label.js';
-import { render, USER_RATING_COUNT, DATA_CHANGE, ANIMATION_TIMEOUT } from '../../../utils.js';
-import { times } from 'lodash';
+import {render, USER_RATING_COUNT, ANIMATION_TIMEOUT} from '../../../utils.js';
 
 export default class UserRating extends AbstractComponent{
   constructor(name, poster, rating, onDataChangeMain) {
@@ -28,7 +27,7 @@ export default class UserRating extends AbstractComponent{
   onError() {
     this._enable();
     this._ratingContainer.style.animation = `shake ${ANIMATION_TIMEOUT / 1000}s`;
-    this._activeRating.onRed();
+    this._activeRating.showError();
 
     setTimeout(() => {
       this._ratingContainer.style.animation = ``
@@ -41,17 +40,17 @@ export default class UserRating extends AbstractComponent{
 
   onDataChange({rating}) {
     if(this._activeRating) {
-      this._activeRating.reset();
+      this._activeRating.removeError();
     }
     this._activeRating = rating;
-    this._disable();
-    this.onDataChangeMain({typeDataChange: DATA_CHANGE.RATING,  value: rating.value})
+    this.disable();
+    this.onDataChangeMain({typeData: typeDataChange.RATING,  value: rating.value})
   }
 
   _resetRating() {
     const undo = this.getElement().querySelector(`.film-details__watched-reset`);
     undo.addEventListener(`click`, () => {
-      this.onDataChange({typeDataChange: DATA_CHANGE.RATING, value: 0})
+      this.onDataChange({typeData: typeDataChange.RATING, value: 0})
     })
   }
 
@@ -73,7 +72,7 @@ export default class UserRating extends AbstractComponent{
     this._renderRatingBtn();
   }
 
-  _disable() {
+  disable() {
     this._input.forEach((input) => input.disable());
   }
 

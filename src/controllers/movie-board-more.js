@@ -21,36 +21,6 @@ export default class MovieBoardMore extends MovieBoard {
     }
   }
 
-  _renderBtn() {
-    render(this._container, this._btn.getElement());
-    this._btn.getElement().addEventListener('click', this._onClick);
-  }
-
-  _showBtn() {
-    showElement(this._btn.getElement())
-    this._btn.getElement().addEventListener('click', this._onClick);
-}
-
-  hideBtn() {
-    hideElement(this._btn.getElement());
-    this._btn.getElement().removeEventListener('click', this._onClick);
-  }
-
-  reset() {
-    this._boardContainer.innerHTML = null;
-    this.hideBtn();
-  }
-
-  _onClick() {
-    const movieToRender = this._movieData.slice(this._countMovieToRender, this._countMovieToRender + this._STEP_TO_RENDER)
-    this._countMovieToRender += this._STEP_TO_RENDER;
-    this._renderMovie(movieToRender);
-
-    if (this._movieData.length <= this._countMovieToRender) {
-      this.hideBtn();
-    }
-  }
-
   render(movieData, flag) {
     this._movieData = movieData;
     this._countMovieToRender = (flag === filterFlag.save) ? this._countMovieToRender : this._STEP_TO_RENDER;
@@ -65,4 +35,36 @@ export default class MovieBoardMore extends MovieBoard {
     const movieToRender = this._movieData.slice(0, this._countMovieToRender);
     this._renderMovie(movieToRender);
   }
+
+  hideBtn() {
+    hideElement(this._btn.getElement());
+    this._btn.getElement().removeEventListener('click', this._onClick);
+  }
+
+  reset() {
+    this._boardContainer.innerHTML = null;
+    this.hideBtn();
+  }
+
+  _renderBtn() {
+    render(this._container, this._btn.getElement());
+    this._btn.getElement().addEventListener('click', this._onClick);
+  }
+
+  _showBtn() {
+    showElement(this._btn.getElement())
+    this._btn.getElement().addEventListener('click', this._onClick);
+  }
+
+
+  _onClick() {
+    const movieToRender = this._movieData.slice(this._countMovieToRender, this._countMovieToRender + this._STEP_TO_RENDER)
+    this._countMovieToRender += this._STEP_TO_RENDER;
+    this._renderMovie(movieToRender);
+
+    if (this._movieData.length <= this._countMovieToRender) {
+      this.hideBtn();
+    }
+  }
+
 }

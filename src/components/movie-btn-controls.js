@@ -19,7 +19,7 @@ export default class MovieBtnControls extends AbstractComponent {
   _onClick() {
     this.getElement().addEventListener(`click`, (evt) => {
       evt.preventDefault();
-      this._onDataChange({typeDataChange: this._dataType, value: !this._data});
+      this._onDataChange(this._dataType);
     });
   }
 }

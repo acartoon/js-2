@@ -1,5 +1,5 @@
 import AbstractComponent from './abstract-component.js';
-import { rank, render } from '../utils.js';
+import {render} from '../utils.js';
 
 export default class Profile extends AbstractComponent {
   constructor() {
@@ -10,10 +10,6 @@ export default class Profile extends AbstractComponent {
   init(container, rank) {
     this._rank = rank;
     render(container, this.getElement());
-  }
-
-  update(rank) {
-    // this.getElement().q
   }
 
   getTemplate() {

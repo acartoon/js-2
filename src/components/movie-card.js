@@ -1,4 +1,4 @@
-import {render, cardControls, typeDataChange} from '../utils.js';
+import {render, CardControls, TypeDataChange} from '../utils.js';
 import moment from 'moment';
 import 'moment-duration-format';
 import MovieBaseComponent from './movie-base-component.js';
@@ -34,10 +34,10 @@ export default class MovieCard extends MovieBaseComponent {
 
   update({typeData, value}) {
     this._updateMovieData({typeData, value});
-    if(typeData === typeDataChange.USER_DETAILS) {
+    if (typeData === TypeDataChange.USER_DETAILS) {
       this._updateBtnControls();
-    } else if(typeData === typeDataChange.REMOVE_COMMENT || typeData === typeDataChange.CREATE_COMMENT) {
-      this._updateCommentsCount(this._comments.length)
+    } else if (typeData === TypeDataChange.REMOVE_COMMENT || typeData === TypeDataChange.CREATE_COMMENT) {
+      this._updateCommentsCount(this._comments.length);
     }
   }
 
@@ -53,11 +53,10 @@ export default class MovieCard extends MovieBaseComponent {
     this._tmpData = null;
   }
 
-
   _updateMovieData({typeData, value}) {
-    if(typeData === typeDataChange.USER_DETAILS) {
+    if (typeData === TypeDataChange.USER_DETAILS) {
       this._user_details = value;
-    } else if(typeData === typeDataChange.REMOVE_COMMENT || typeData === typeDataChange.CREATE_COMMENT) {
+    } else if (typeData === TypeDataChange.REMOVE_COMMENT || typeData === TypeDataChange.CREATE_COMMENT) {
       this._comments = value.movie;
     }
   }
@@ -74,8 +73,8 @@ export default class MovieCard extends MovieBaseComponent {
 
   _renderBtnControls() {
     const btnContainer = this.getElement().querySelector(`.film-card__controls`);
-    Object.keys(cardControls).forEach((key) => {
-      const btn = new MovieBtnControls(cardControls[key], this._user_details[key], this.onDataChange);
+    Object.keys(CardControls).forEach((key) => {
+      const btn = new MovieBtnControls(CardControls[key], this._user_details[key], this.onDataChange);
       render(btnContainer, btn.getElement());
     });
   }
@@ -84,19 +83,19 @@ export default class MovieCard extends MovieBaseComponent {
     this._initTmpData();
 
     // поменять когда исправлю тип данных
-    switch(typeData) {
-      case typeDataChange.WATCHLIST :
+    switch (typeData) {
+      case TypeDataChange.WATCHLIST :
         this._tmpData.watchlist = !this._tmpData.watchlist;
         break;
-      case typeDataChange.ALREADY_WATCHED :
+      case TypeDataChange.ALREADY_WATCHED :
         this._tmpData.already_watched = !this._tmpData.already_watched;
         break;
-      case typeDataChange.FAVORITE :
+      case TypeDataChange.FAVORITE :
         this._tmpData.favorite = !this._tmpData.favorite;
         break;
     }
 
-    this._onDataChangeMain({typeData: typeDataChange.USER_DETAILS, value: this._tmpData})
+    this._onDataChangeMain({typeData: TypeDataChange.USER_DETAILS, value: this._tmpData});
     this._resetTmpData();
   }
 }

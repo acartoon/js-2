@@ -1,6 +1,6 @@
 import MovieCard from "../components/movie-card";
-import {render, Position, typeDataChange} from "../utils";
-import MovieDetailsController from "./movie-details-controller";
+import {render, Position, TypeDataChange} from "../utils";
+import MovieDetailsController from "./movie-details.js";
 
 export default class MovieController {
   constructor(movieData, api, container, onDataChangeMain, onChangeView) {
@@ -17,7 +17,7 @@ export default class MovieController {
   }
 
   init() {
-    render(this._container, this._movie.getElement(), Position.BEFOREEND)
+    render(this._container, this._movie.getElement(), Position.BEFOREEND);
     this._initMovieDetails();
   }
 
@@ -27,15 +27,13 @@ export default class MovieController {
     }
   }
 
-  update({typeData, value}) {
-    this._updateData({typeData, value});
+  update(props) {
+    this._updateData(props);
 
-    if(typeData !== typeDataChange.RATING) {
-      this._movie.update({typeData, value});
+    if (this._movieDetails) {
+      this._movieDetails.update(props);
     }
-    if(this._movieDetails) {
-      this._movieDetails.update({typeData, value});
-    }
+    this._movie.update(props);
   }
 
   _initMovieDetails() {
@@ -50,22 +48,20 @@ export default class MovieController {
   }
 
   _updateData({typeData, value}) {
-    if(typeData === typeDataChange.REMOVE_COMMENT) {
+    if (typeData === TypeDataChange.REMOVE_COMMENT) {
       this._movieData.comments = value;
-    } else if (typeData === typeDataChange.CREATE_COMMENT) {
+    } else if (typeData === TypeDataChange.CREATE_COMMENT) {
       this._movieData.comments = value.comments;
-    } else if (typeData === typeDataChange.USER_DETAILS || typeData === typeDataChange.RATING) {
+    } else if (typeData === TypeDataChange.USER_DETAILS || typeData === TypeDataChange.RATING) {
       this._movieData.user_details = value;
     }
   }
-
 
   _unrenderMovieDetails() {
     document.body.classList.remove(`hide-overflow`);
     this._movieDetails.unrender();
     this._movieDetails = null;
   }
-
 
   onDataChange({typeData, value}) {
     // в boardController
@@ -75,7 +71,6 @@ export default class MovieController {
   onError(data) {
     this._movieDetails.onError(data);
   }
-
 
   _onMovieClick() {
     this._api.getComments(this._movieData.id)

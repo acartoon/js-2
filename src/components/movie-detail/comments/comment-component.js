@@ -1,6 +1,6 @@
 import AbstractComponent from '../../abstract-component.js';
 import moment from 'moment';
-import {unrender, typeDataChange, dateFormat} from '../../../utils.js';
+import {unrender, TypeDataChange, DateFormat} from '../../../utils.js';
 
 export default class CommentComponent extends AbstractComponent {
   constructor({id, comment, author, date, emotion}, onDataChange) {
@@ -30,19 +30,32 @@ export default class CommentComponent extends AbstractComponent {
       <p class="film-details__comment-text">${this._comment}</p>
       <p class="film-details__comment-info">
       <span class="film-details__comment-author">${this._author}</span>
-      <span class="film-details__comment-day">${this._onDate(this._date)}</span>
+      <span class="film-details__comment-day">${this._getDateFormat(this._date)}</span>
       <button class="film-details__comment-delete">Delete</button>
       </p>
       </div>
       </li>`;
   }
 
+  remove() {
+    unrender(this.getElement());
+    this.removeElement();
+  }
+
   _isOnline() {
     return window.navigator.onLine;
   }
 
+  _init() {
+    this._onClick();
+    window.addEventListener(`offline`, this._onWindowsOffline);
 
-  _onDate() {
+    if (!this._isOnline()) {
+      this._onWindowsOffline();
+    }
+  }
+
+  _getDateFormat() {
     let value = ``;
     const date = moment(this._date);
     const now = moment(new Date());
@@ -51,27 +64,27 @@ export default class CommentComponent extends AbstractComponent {
     const hours = parseInt(duration.asHours());
     const days = parseInt(duration.asDays());
 
-    if(minutes <= 0) {
-      value = dateFormat.NOW;
+    if (minutes <= 0) {
+      value = DateFormat.NOW;
     } else if (minutes <= this._minHours + 2) {
-      value = dateFormat.MINUTE;
-    } else if(hours > this._minHours && hours < this._minHours + 1 ) {
-      value = dateFormat.HOURE;
-    } else if (hours > this._minHours + 1  && hours < this._maxHours) {
-      value = dateFormat.FEW_HOURS;
-    } else if(days => this._minHours) {
-      value = `a ${days} day ago`
+      value = DateFormat.MINUTE;
+    } else if (hours > this._minHours && hours < this._minHours + 1 ) {
+      value = DateFormat.HOURE;
+    } else if (hours > this._minHours + 1 && hours < this._maxHours) {
+      value = DateFormat.FEW_HOURS;
+    } else if (days >= this._minHours) {
+      value = `a ${days} day ago`;
     }
     return value;
   }
-
 
   _onClick() {
     this._deleteBtn.addEventListener(`click`, (evt) => {
       evt.preventDefault();
       this._deleteBtn.innerHTML = this._titleBtn;
       this._deleteBtn.disabled = true;
-      this._onDataChange({typeData: typeDataChange.REMOVE_COMMENT, value: this});
+      // в CommentsController
+      this._onDataChange({typeData: TypeDataChange.REMOVE_COMMENT, value: this});
     });
   }
 
@@ -83,20 +96,4 @@ export default class CommentComponent extends AbstractComponent {
   _onWindowsOnline() {
     this._deleteBtn.disabled = false;
   }
-
-  remove() {
-    unrender(this.getElement());
-    this.removeElement();
-  }
-
-
-  _init() {
-    this._onClick();
-    window.addEventListener(`offline`, this._onWindowsOffline);
-
-    if(!this._isOnline()) {
-      this._onWindowsOffline();
-    }
-  }
-
 }

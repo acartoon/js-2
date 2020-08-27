@@ -1,13 +1,12 @@
 import AbstractComponent from './abstract-component.js';
 
 export default class StatsListComponent extends AbstractComponent {
-  constructor(container) {
+  constructor() {
     super();
-
   }
 
   getValue(count, duration, genre) {
-    const hours = parseInt(duration/60);
+    const hours = parseInt(duration / 60);
     const min = parseInt(duration % 60);
 
     const countContainer = this.getElement().querySelector(`[data-type="count"]`);

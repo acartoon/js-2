@@ -1,4 +1,4 @@
-import { toJSON, checkStatus, Method } from "../utils";
+import {toJSON, checkStatus, Method} from "../utils";
 
 
 export default class API {
@@ -45,7 +45,7 @@ export default class API {
       body: JSON.stringify(data),
       headers: new Headers({'Content-Type': `application/json`})
     })
-      .then(toJSON)
+      .then(toJSON);
   }
 
 
@@ -66,6 +66,6 @@ export default class API {
       body: JSON.stringify(data),
       headers: new Headers({'Content-Type': `application/json`})
     })
-    .then(toJSON)
+    .then(toJSON);
   }
-};
+}

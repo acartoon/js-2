@@ -10,22 +10,21 @@
     "start": "webpack-dev-server --open"
   },
   "devDependencies": {
-    "chart.js": "^2.8.0",
-    "chartjs-plugin-datalabels": "^0.7.0",
+    "chart.js": "2.9.3",
+    "chartjs-plugin-datalabels": "0.7.0",
     "eslint": "6.1.0",
     "eslint-config-htmlacademy": "0.5.2",
-    "moment": "^2.24.0",
+    "lodash": "4.17.20",
+    "moment": "2.27.0",
+    "moment-duration-format": "2.3.2",
     "moment-locales-webpack-plugin": "1.1.0",
-    "stylelint-config-htmlacademy": "^0.1.4",
-    "webpack": "^4.39.1",
-    "webpack-cli": "^3.3.6",
+    "stylelint-config-htmlacademy": "0.1.4",
+    "webpack": "4.44.1",
+    "webpack-cli": "3.3.12",
     "webpack-dev-server": "3.8.0"
   },
   "engines": {
     "node": "10"
   },
-  "dependencies": {
-    "lodash": "^4.17.15",
-    "moment-duration-format": "^2.3.2"
-  }
+  "dependencies": {}
 }

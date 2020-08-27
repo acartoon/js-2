@@ -1,6 +1,6 @@
 import NavigationContainer from "../components/navigation-container";
 import NavigationElement from "../components/navigation-element";
-import { render, Position, getCountFilms, filter} from "../utils";
+import {render, Position, getCountFilms, Filter} from "../utils";
 export default class MainNavController {
   constructor(container, onClick) {
     this._container = container;
@@ -20,17 +20,16 @@ export default class MainNavController {
       HISTORY: getCountFilms(this._movieData, `already_watched`),
       FAVORITES: getCountFilms(this._movieData, `favorite`),
       STATS: null,
-    }
+    };
 
     this._navContainer.getElement().innerHTML = ``;
 
-    // поменять ffilter
-    Object.keys(filter).forEach((ffilter) => {
-      const navElem = new NavigationElement(filter[ffilter], filterCount[ffilter]);
-      if(ffilter === `ALL`) {
+    Object.keys(Filter).forEach((filterItem) => {
+      const navElem = new NavigationElement(Filter[filterItem], filterCount[filterItem]);
+      if (Filter[filterItem].anchor === Filter.ALL.anchor) {
         this._activeElement = navElem;
       }
-      navElem.init(this.onBtnlick.bind(this))
+      navElem.init(this.onBtnClick.bind(this));
       render(this._navContainer.getElement(), navElem.getElement(), Position.BEFOREEND);
     });
   }
@@ -47,10 +46,9 @@ export default class MainNavController {
     render(this._container, this._navContainer.getElement(), Position.BEFOREEND);
   }
 
-
-  onBtnlick(data, activeBtn) {
+  onBtnClick(data, activeBtn) {
     this._onClick(data);
-    this._activeElement.deactive()
+    this._activeElement.deactive();
     this._activeElement = activeBtn;
   }
 }

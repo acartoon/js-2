@@ -5,7 +5,7 @@ export default class StatsRankComponent extends AbstractComponent {
   init(rankName) {
     const rank = this.getElement().querySelector(`.statistic__rank-label`);
     rank.innerHTML = rankName;
-  };
+  }
 
   getTemplate() {
     return `<section class="statistic">

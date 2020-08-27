@@ -1,6 +1,6 @@
 import MovieBoard from "./movie-board";
 import BtnShowMore from "../components/btn-show-more";
-import { render, hideElement, filterFlag, unrender, showElement } from "../utils";
+import {render, hideElement, CountFlag, showElement} from "../utils";
 
 export default class MovieBoardMore extends MovieBoard {
   constructor(movieData, api, container, onDataChangeMain) {
@@ -16,29 +16,28 @@ export default class MovieBoardMore extends MovieBoard {
     const movieToRender = this._movieData.slice(0, this._countMovieToRender);
     this._renderMovie(movieToRender);
 
-    if(this._movieData.length > this._STEP_TO_RENDER) {
+    if (this._movieData.length > this._STEP_TO_RENDER) {
       this._renderBtn();
     }
   }
 
   render(movieData, flag) {
     this._movieData = movieData;
-    this._countMovieToRender = (flag === filterFlag.save) ? this._countMovieToRender : this._STEP_TO_RENDER;
+    this._countMovieToRender = (flag === CountFlag.save) ? this._countMovieToRender : this._STEP_TO_RENDER;
     if (this._movieData.length > this._countMovieToRender) {
       this._showBtn();
-    }
-    else {
+    } else {
       this.hideBtn();
     }
 
-   this._boardContainer.innerHTML = ``;
+    this._boardContainer.innerHTML = ``;
     const movieToRender = this._movieData.slice(0, this._countMovieToRender);
     this._renderMovie(movieToRender);
   }
 
   hideBtn() {
     hideElement(this._btn.getElement());
-    this._btn.getElement().removeEventListener('click', this._onClick);
+    this._btn.getElement().removeEventListener(`click`, this._onClick);
   }
 
   reset() {
@@ -48,17 +47,17 @@ export default class MovieBoardMore extends MovieBoard {
 
   _renderBtn() {
     render(this._container, this._btn.getElement());
-    this._btn.getElement().addEventListener('click', this._onClick);
+    this._btn.getElement().addEventListener(`click`, this._onClick);
   }
 
   _showBtn() {
-    showElement(this._btn.getElement())
-    this._btn.getElement().addEventListener('click', this._onClick);
+    showElement(this._btn.getElement());
+    this._btn.getElement().addEventListener(`click`, this._onClick);
   }
 
 
   _onClick() {
-    const movieToRender = this._movieData.slice(this._countMovieToRender, this._countMovieToRender + this._STEP_TO_RENDER)
+    const movieToRender = this._movieData.slice(this._countMovieToRender, this._countMovieToRender + this._STEP_TO_RENDER);
     this._countMovieToRender += this._STEP_TO_RENDER;
     this._renderMovie(movieToRender);
 

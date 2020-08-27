@@ -1,5 +1,5 @@
 import StatsRankComponent from "../components/stats-rank-component";
-import { render, showElement, hideElement, statsParam, getRank, rank } from "../utils";
+import {render, showElement, hideElement, StatsParam, getRank} from "../utils";
 import moment from 'moment';
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
@@ -12,8 +12,8 @@ export default class StatsController {
   constructor(container) {
     this._container = container;
     this._statsRank = new StatsRankComponent(this._container);
-    this._onFilterBtnClick = this._onFilterBtnClick.bind(this);
-    this._filter = new StatsFilterComponent(this._container, this._onFilterBtnClick);
+    this.onFilterBtnClick = this.onFilterBtnClick.bind(this);
+    this._filter = new StatsFilterComponent(this.onFilterBtnClick);
     this._list = new StatsListComponent(this._container);
     this._chartWrap = new ChartWrapComponent(this._container);
     this._chart = null;
@@ -34,22 +34,22 @@ export default class StatsController {
   }
 
   // обработчик клика на фильтры
-  _onFilterBtnClick(filter) {
+  onFilterBtnClick(filter) {
     const filterType = {
       all: this._movieData,
-      today: this._movieData.filter((movie) => moment(movie.user_details.watching_date).isSame(moment(), 'day')),
-      week: this._movieData.filter((movie) => moment(movie.user_details.watching_date).isSame(moment(), 'week')),
-      month: this._movieData.filter((movie) => moment(movie.user_details.watching_date).isSame(moment(), 'month')),
-      year: this._movieData.filter((movie) => moment(movie.user_details.watching_date).isSame(moment(), 'year')),
+      today: this._movieData.filter((movie) => moment(movie.user_details.watching_date).isSame(moment(), `day`)),
+      week: this._movieData.filter((movie) => moment(movie.user_details.watching_date).isSame(moment(), `week`)),
+      month: this._movieData.filter((movie) => moment(movie.user_details.watching_date).isSame(moment(), `month`)),
+      year: this._movieData.filter((movie) => moment(movie.user_details.watching_date).isSame(moment(), `year`)),
     };
 
     this._destroyChart();
     this._initStats(filterType[filter]);
-  };
+  }
 
   // отрисовка статистики
   _initStats(movieData) {
-    if(movieData.length === 0) {
+    if (movieData.length === 0) {
       this._list.getValue(0, 0, this._noData);
       return;
     }
@@ -61,20 +61,20 @@ export default class StatsController {
     const topGenre = Object.entries(movieGenre).sort((a, b) => b[1] - a[1])[0][0];
 
     this._list.getValue(countMovie, duration, topGenre);
-    container.height = statsParam.BAR_HEIGHT * Object.keys(movieGenre).length;
+    container.height = StatsParam.BAR_HEIGHT * Object.keys(movieGenre).length;
     this._renderChart(container, movieGenre);
-  };
+  }
 
   // отрисовать статистику
   show(movieData, commentsData) {
     this._movieData = movieData.filter((movie) => movie.user_details.already_watched === true);
     this._commentsData = commentsData;
 
-    const userRank = getRank(movieData.length, rank);
+    const userRank = getRank(movieData.length);
     this._statsRank.init(userRank);
     this._initStats(this._movieData);
     this._show();
-  };
+  }
 
   // получить продолжительность фильмов
   _getDurationWachedMovie(moveiData) {
@@ -82,36 +82,36 @@ export default class StatsController {
       result += movie.film_info.runtime;
       return result;
     }, 0);
-  };
+  }
 
-    // получить жанры
+  // получить жанры
   _getGenresMovie(movieData) {
-     return movieData.reduce((res, movie) => {
+    return movieData.reduce((res, movie) => {
       movie.film_info.genre.forEach(genre => {
         // проверить этот ++ress
-        res[genre] = res[genre] ? ++res[genre]: 1;
+        res[genre] = res[genre] ? ++res[genre] : 1;
       });
       return res;
     }, {});
-  };
+  }
 
   // настройки статистики
   _getChartOptions() {
     return {
       plugins: {
         datalabels: {
-          color: statsParam.LABEL_COLOR,
-          fontSize: statsParam.LABEL_FONT_SIZE,
-          anchor: statsParam.LABEL_ANCHOR,
-          align: statsParam.LABEL_ALIGNT,
-          offset: statsParam.LABEL_OFFSET,
+          color: StatsParam.LABEL_COLOR,
+          fontSize: StatsParam.LABEL_FONT_SIZE,
+          anchor: StatsParam.LABEL_ANCHOR,
+          align: StatsParam.LABEL_ALIGNT,
+          offset: StatsParam.LABEL_OFFSET,
         }
       },
       scales: {
         xAxes: [{
           display: false,
           ticks: {
-            suggestedMin: statsParam.MIN_X_LIMIT,
+            suggestedMin: StatsParam.MIN_X_LIMIT,
           }
         }],
         yAxes: [{
@@ -120,9 +120,9 @@ export default class StatsController {
             drawBorder: false,
           },
           ticks: {
-            fontColor: statsParam.LABEL_COLOR,
-            fontSize: statsParam.LABEL_FONT_SIZE,
-            padding: statsParam.LABEL_PADDING,
+            fontColor: StatsParam.LABEL_COLOR,
+            fontSize: StatsParam.LABEL_FONT_SIZE,
+            padding: StatsParam.LABEL_PADDING,
           }
         }]
       },
@@ -132,8 +132,8 @@ export default class StatsController {
       tooltips: {
         enabled: false
       },
-    }
-  };
+    };
+  }
 
   // получить данные о фильмах
   _getChartData(movieGenre) {
@@ -141,11 +141,11 @@ export default class StatsController {
       labels: Object.keys(movieGenre),
       datasets: [{
         data: Object.values(movieGenre),
-        backgroundColor: statsParam.GENRE_COLOR,
+        backgroundColor: StatsParam.GENRE_COLOR,
 
       }],
     };
-  };
+  }
 
   // очистить
   _destroyChart() {
@@ -153,12 +153,12 @@ export default class StatsController {
       this._chart.destroy();
       this._chart = null;
     }
-  };
+  }
 
   // отрисовать статистику
   _renderChart(container, movieGenre) {
     this._chart = new Chart(container, {
-      type: statsParam.CHART_TYPE,
+      type: StatsParam.CHART_TYPE,
       data: this._getChartData(movieGenre),
       responsive: true,
       maintainAspectRatio: false,
@@ -166,17 +166,17 @@ export default class StatsController {
       plugins: [ChartDataLabels],
       options: this._getChartOptions(),
     });
-  };
+  }
 
   // показать окно статистики
   _show() {
-    showElement(this._statsRank.getElement())
-  };
+    showElement(this._statsRank.getElement());
+  }
 
   // скрыть окно статистики
   hide() {
     this._filter.default();
     this._destroyChart();
-    hideElement(this._statsRank.getElement())
-  };
+    hideElement(this._statsRank.getElement());
+  }
 }

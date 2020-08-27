@@ -1,5 +1,5 @@
 import AbstractComponent from './abstract-component.js';
-import { hideElement, showElement } from '../utils.js';
+import {hideElement, showElement} from '../utils.js';
 
 export default class NavigationContainer extends AbstractComponent {
 
@@ -14,5 +14,4 @@ export default class NavigationContainer extends AbstractComponent {
   show() {
     showElement(this.getElement());
   }
-
 }

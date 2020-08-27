@@ -1,8 +1,7 @@
 import AbstractComponent from '../abstract-component.js';
-import {render, Position, PopupBtnControl, typeDataChange} from '../../utils.js';
-import MovieBtnStateLabel from './btn-controls-label';
-import MovieBtnStateInput from './btn-controls-input';
+import {render, Position, PopupBtnControl, TypeDataChange} from '../../utils.js';
 import {cloneDeep} from 'lodash';
+import BtnControlComponents from './btn-control.js';
 
 export default class BtnControls extends AbstractComponent {
   constructor(btnControls, onDataChangeMain) {
@@ -24,17 +23,18 @@ export default class BtnControls extends AbstractComponent {
   }
 
    // изменение данных при нажатии на кнопку
-   onDataChange(typeData) {
+  onDataChange(typeData) {
+    console.log(typeData)
     this._initTmpData();
     // поменять когда исправлю тип данных
-    switch(typeData) {
-      case typeDataChange.WATCHLIST :
+    switch (typeData) {
+      case TypeDataChange.WATCHLIST :
         this._tmpData.watchlist = !this._tmpData.watchlist;
         break;
-      case typeDataChange.ALREADY_WATCHED :
+      case TypeDataChange.ALREADY_WATCHED :
         this._tmpData.already_watched = !this._tmpData.already_watched;
         break;
-      case typeDataChange.FAVORITE :
+      case TypeDataChange.FAVORITE :
         this._tmpData.favorite = !this._tmpData.favorite;
         break;
     }
@@ -52,19 +52,19 @@ export default class BtnControls extends AbstractComponent {
   }
 
   _renderBtnControls({watchlist, already_watched, favorite}) {
+    console.log(watchlist, already_watched, favorite)
     // поправить
     const btnControl = {
-      watchlist: watchlist,
+      watchlist,
       watched: already_watched,
-      favorite: favorite,
+      favorite,
     };
 
     // отрисовка кнопок в попапе
     Object.keys(PopupBtnControl).forEach((btn) => {
-      const movieBtnStateLabel = new MovieBtnStateLabel(PopupBtnControl[btn], this.onDataChange);
-      const movieBtnStateInput = new MovieBtnStateInput(btnControl[btn], PopupBtnControl[btn].name)
-      render(this.getElement(), movieBtnStateInput.getElement(), Position.BEFOREEND);
-      render(this.getElement(), movieBtnStateLabel.getElement(), Position.BEFOREEND);
+      console.log(PopupBtnControl[btn]);
+      const button = new BtnControlComponents(PopupBtnControl[btn], btnControl[btn], this.onDataChange);
+      this.getElement().appendChild(button.getElement());
     });
   }
 

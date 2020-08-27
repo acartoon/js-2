@@ -1,8 +1,8 @@
 import AbstractComponent from './abstract-component.js';
-import { render, hideElement, showElement, Position } from '../utils.js';
+import {hideElement, showElement} from '../utils.js';
 
 export default class ResultTitle extends AbstractComponent {
-  constructor(container, ) {
+  constructor(container) {
     super();
     this._count = null;
     this._container = container;
@@ -10,7 +10,7 @@ export default class ResultTitle extends AbstractComponent {
   }
 
   _init() {
-    this._container.prepend(this.getElement())
+    this._container.prepend(this.getElement());
     this.hide();
   }
 

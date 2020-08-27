@@ -1,7 +1,7 @@
 import AbstractComponent from './abstract-component.js';
 
 export default class NavigationElement extends AbstractComponent {
-  constructor({title, anchor, active}, count, ) {
+  constructor({title, anchor, active}, count) {
     super();
     this._title = title;
     this._active = active;

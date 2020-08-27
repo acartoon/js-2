@@ -1,17 +1,20 @@
 import AbstractComponent from '../../abstract-component.js';
-import {emoji, render, Position, ANIMATION_TIMEOUT} from '../../../utils.js';
-import EmojiInput from './emoji-input.js';
-import EmojiLabel from './emoji-label.js';
+import {Emoji, render, Position, ANIMATION_TIMEOUT} from '../../../utils.js';
+import EmojiComponent from  './emoji.js';
+
 
 export default class NewComment extends AbstractComponent {
-  constructor(onTextareaInput, getEmotion) {
+  constructor(onTextareaInput, getEmotion, onEscKeyDown) {
     super();
+    this._onEscKeyDown = onEscKeyDown;
     this._onTextareaInput = onTextareaInput;
     this._getEmotion = getEmotion;
     this._selectedEmotion = null;
     this._onWindowOnline = this._onWindowOnline.bind(this);
     this._onWindowOffline = this._onWindowOffline.bind(this);
     this._inputComment = this.getElement().querySelector(`.film-details__comment-input`);
+    this._onFocus = this._onFocus.bind(this);
+    this._onBlur = this._onBlur.bind(this);
   }
 
   getTemplate() {
@@ -47,8 +50,8 @@ export default class NewComment extends AbstractComponent {
 
   // удаление обработчиков при закрытии попапа
   removeListeners() {
-    window.removeEventListener('online',  this._onWindowOnline);
-    window.removeEventListener('offline',  this._onWindowOffline);
+    window.removeEventListener(`online`, this._onWindowOnline);
+    window.removeEventListener(`offline`, this._onWindowOffline);
   }
 
   removeError() {
@@ -57,40 +60,38 @@ export default class NewComment extends AbstractComponent {
 
   // отрисовка компонента
   init(container) {
-    this._container = container;
     this._render();
-    render(this._container, this.getElement());
+    render(container, this.getElement());
 
-   if(!this._isOnline()) {
-    this._onWindowOffline();
-   }
+    if (!this._isOnline()) {
+      this._onWindowOffline();
+    }
+  }
+
+  _render() {
+    const container = this.getElement().querySelector(`.film-details__emoji-list`);
+    Object.keys(Emoji).forEach((emojiItem) => {
+      const emoji = new EmojiComponent(Emoji[emojiItem], this.onChangeEmotion.bind(this));
+      render(container, emoji.getElement(), Position.BEFOREEND);
+    });
+
+    this._inputComment.addEventListener(`focus`, this._onFocus);
+    this._inputComment.addEventListener(`blur`, this._onBlur);
   }
 
   _shake() {
-    const img = this.getElement().querySelector(`.film-details__add-emoji-label`).firstChild;
-    img.style.animation = `shake ${ANIMATION_TIMEOUT / 1000}s`
+    const img = this.getElement().querySelector(`.film-details__add-emoji-label`);
+    img.style.animation = `shake ${ANIMATION_TIMEOUT / 1000}s`;
 
     setTimeout(() => {
       img.style.animation = ``;
     }, ANIMATION_TIMEOUT);
   }
 
-  _render() {
-    const container = this.getElement().querySelector(`.film-details__emoji-list`);
-    Object.keys(emoji).forEach((em) => {
-      const emojiLabel = new EmojiLabel(emoji[em], this.onChangeEmotion.bind(this));
-      const emojiInput = new EmojiInput(emoji[em]);
-      render(container, emojiLabel.getElement(), Position.BEFOREEND);
-      render(container, emojiInput.getElement(), Position.BEFOREEND);
-    });
-    this._onInput();
-  }
-
   _getImage() {
     const img = new Image(55, 55);
     img.src = `images/emoji/${this._selectedEmotion}.png`;
     img.alt = `${this._selectedEmotion}`;
-    console.log(img)
     return img;
   }
 
@@ -99,21 +100,24 @@ export default class NewComment extends AbstractComponent {
   }
 
   // обработчики событий
-
   _onWindowOnline() {
     this._inputComment.disabled = false;
-    window.addEventListener('offline',  this._onWindowOffline);
+    window.addEventListener(`offline`, this._onWindowOffline);
   }
 
   _onWindowOffline() {
     this._inputComment.disabled = true;
-    window.addEventListener('online',  this._onWindowOnline);
+    window.addEventListener(`online`, this._onWindowOnline);
   }
 
-  _onInput() {
-    this._inputComment.addEventListener(`input`, (evt) => {
-      this._onTextareaInput();
-    });
+  _onFocus() {
+    this._onTextareaInput();
+    document.removeEventListener(`keydown`, this._onEscKeyDown);
+  }
+
+  _onBlur() {
+    document.addEventListener(`keydown`, this._onEscKeyDown);
+    this._inputComment.removeEventListener(`focus`, this._onFocus);
   }
 
   onChangeEmotion(emotion) {

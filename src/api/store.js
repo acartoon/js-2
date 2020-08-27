@@ -1,4 +1,4 @@
-import { typeDataStore } from "../utils";
+import {TypeDataStore} from "../utils";
 
 export default class Store {
   constructor({key, storage}) {
@@ -8,30 +8,24 @@ export default class Store {
 
   setItem({key, item, state, dataType}) {
     const items = this.getAll();
-    if(!items[key]) {
-      items[key] = {}
+    if (!items[key]) {
+      items[key] = {};
     }
     items[key][`state`] = state;
-    switch(dataType) {
-      case typeDataStore.ALL:
+    switch (dataType) {
+      case TypeDataStore.ALL:
         items[key] = item;
         break;
-      case typeDataStore.MOVIE:
-        items[key]['movie'] = item;
+      case TypeDataStore.MOVIE:
+        items[key][`movie`] = item;
         break;
-      case typeDataStore.COMMENTS:
-        items[key]['comments'] = item;
+      case TypeDataStore.COMMENTS:
+        items[key][`comments`] = item;
         break;
     }
     this._storage.setItem(this._storeKey, JSON.stringify(items));
   }
 
-  // removeItem({key}) {
-  //   const items = this.getAll();
-  //   delete items[key];
-
-  //   this._storage.setItem(this._storeKey, JSON.stringify(items));
-  // }
 
   getItem({key}) {
     const items = this.getAll();
@@ -49,8 +43,8 @@ export default class Store {
     try {
       return JSON.parse(items);
     } catch (e) {
-      console.error(`Error parse items. Error: ${e}. Items: ${items}`);
+      // console.error(`Error parse items. Error: ${e}. Items: ${items}`);
       return emptyItems;
     }
   }
-};
+}

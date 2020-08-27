@@ -1,7 +1,7 @@
 import moment from 'moment';
 import MovieBaseComponent from '../movie-base-component.js';
 
-export default class MovieDetails extends MovieBaseComponent{
+export default class MovieDetails extends MovieBaseComponent {
   constructor(data) {
     super(data);
   }
